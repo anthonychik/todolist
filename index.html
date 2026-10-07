@@ -28,16 +28,17 @@
 
     <script>
         // =========================================================================
-        // 🔴🔴🔴 請將下方 firebaseConfig 的內容，替換成你剛剛在 Firebase 複製的設定！ 🔴🔴🔴
+        // 🔴🔴🔴 請將下方替換成你複製的設定。
+        // ⚠️ 檢查重點：如果你的設定裡沒有 "databaseURL" 這一行，請手動補上！
         // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCC6ah6dp2mMd2DqXzSVv-yVYaTY09-3Uc",
             authDomain: "to-do-list-60632.firebaseapp.com",
-            databaseURL: "https://to-do-list-60632-default-rtdb.asia-southeast1.firebasedatabase.app",
+            databaseURL: "https://to-do-list-60632-default-rtdb.asia-southeast1.firebasedatabase.app",  // <--- 很多卡住的原因是因為少了這一行
             projectId: "to-do-list-60632",
             storageBucket: "to-do-list-60632.firebasestorage.app",
             messagingSenderId: "288681866346",
-            appId: "1:288681866346:web:7a7729ce45c85826fc8613"
+            appId: "1:288681866346:web:7a7729ce45c85826fc8613",
             measurementId: "G-PWY621RE08"
         };
         // =========================================================================
@@ -74,9 +75,9 @@
             <header>
                 <!-- 雲端狀態列 -->
                 <div v-if="syncKey" class="flex justify-center mb-3">
-                    <span class="text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 transition-colors" :class="isCloudConnected ? (isDark ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-green-100 text-green-600') : (isDark ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-100 text-yellow-600')">
-                        <span class="w-1.5 h-1.5 rounded-full" :class="isCloudConnected ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'"></span>
-                        {{ isCloudConnected ? '已連接雲端同步' : '雲端連線中...' }}
+                    <span class="text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 transition-colors" :class="isCloudConnected ? (isDark ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-green-100 text-green-600') : (isCloudFailed ? 'bg-red-500/10 text-red-400 border border-red-500/20' : (isDark ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-100 text-yellow-600'))">
+                        <span class="w-1.5 h-1.5 rounded-full" :class="isCloudConnected ? 'bg-green-500' : (isCloudFailed ? 'bg-red-500' : 'bg-yellow-500 animate-pulse')"></span>
+                        {{ isCloudConnected ? '已連接雲端同步' : (isCloudFailed ? '雲端連線失敗 (目前為單機模式)' : '雲端連線中...') }}
                     </span>
                 </div>
 
@@ -290,7 +291,7 @@
                                 </button>
                                 <span class="text-xl font-bold w-4 text-center" :class="isDark ? 'text-white' : ''">{{ newTaskTargetCount }}</span>
                                 <button type="button" @click="increaseTarget" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/10'">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                 </button>
                             </div>
                         </div>
@@ -315,12 +316,12 @@
                     </div>
 
                     <div class="space-y-2.5">
-                        <button @click="confirmDelete('single')" class="w-full p-4 rounded-xl border transition text-left" :class="isDark ? 'bg-[#131314] hover:bg-[#282a2c] border-[#333537]' : 'bg-black/5 hover:bg-black/10 border-black/5'">
+                        <button @click="confirmDelete('single')" class="w-full p-4 rounded-xl border transition text-left" :class="isDark ? 'bg-sepia-bg hover:bg-sepia-border border-sepia-border text-white' : 'bg-black/5 hover:bg-black/10 border-black/5'">
                             <p class="font-semibold text-sm" :class="isDark ? 'text-white' : ''">僅刪除這天 ({{ selectedDayDateStr }})</p>
                             <p class="text-[11px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">今天跳過此事項，不影響未來排程</p>
                         </button>
                         
-                        <button @click="confirmDelete('future')" class="w-full p-4 rounded-xl border transition text-left" :class="isDark ? 'bg-[#131314] hover:bg-[#282a2c] border-[#333537]' : 'bg-black/5 hover:bg-black/10 border-black/5'">
+                        <button @click="confirmDelete('future')" class="w-full p-4 rounded-xl border transition text-left" :class="isDark ? 'bg-sepia-bg hover:bg-sepia-border border-sepia-border text-white' : 'bg-black/5 hover:bg-black/10 border-black/5'">
                             <p class="font-semibold text-sm" :class="isDark ? 'text-white' : ''">從這天起刪除 (終止計畫)</p>
                             <p class="text-[11px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">保留過去的歷史紀錄，未來不再排程</p>
                         </button>
@@ -347,8 +348,8 @@
                     
                     <div class="mb-6 bg-black/5 dark:bg-[#131314] border border-black/5 dark:border-[#333537] rounded-xl p-4">
                         <p class="text-sm font-semibold mb-1" :class="isDark ? 'text-white' : ''">🔑 目前同步金鑰</p>
-                        <p class="text-xs font-mono break-all" :class="isDark ? 'text-green-400' : 'text-green-600'">{{ syncKey }}</p>
-                        <p class="text-[10px] mt-1.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">在新設備輸入此金鑰即可登入。</p>
+                        <p class="text-xs font-mono break-all" :class="isDark ? 'text-green-400' : 'text-green-600'">{{ syncKey || '未設定' }}</p>
+                        <p class="text-[10px] mt-1.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">在新設備輸入此金鑰即可登入並同步雲端資料。</p>
                     </div>
 
                     <div class="mb-6">
@@ -368,7 +369,7 @@
                     <div class="space-y-3 pt-2">
                         <button @click="resetData" class="w-full py-3 rounded-xl border border-red-500/30 text-red-500 text-sm font-medium hover:bg-red-500/10 transition flex items-center justify-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-                            <span>登出並清除手機暫存資料</span>
+                            <span>登出金鑰並清除本機暫存</span>
                         </button>
                     </div>
 
@@ -388,6 +389,7 @@
                 const showSyncModal = ref(!syncKey.value);
                 const syncKeyInput = ref('');
                 const isCloudConnected = ref(false);
+                const isCloudFailed = ref(false);
 
                 const daysOfWeek = [
                     { value: 1, label: '一', shortLabel: 'Mon' }, { value: 2, label: '二', shortLabel: 'Tue' },
@@ -455,32 +457,57 @@
                 const tasks = ref([]);
                 const completions = ref({});
 
+                // --- 🌟 關鍵修復：保證本地資料一定會顯示，不怕雲端卡住！ ---
+                const loadLocalData = () => {
+                    const savedTasks = localStorage.getItem('todo_repeat_tasks_v5') || localStorage.getItem('todo_repeat_tasks_v4') || '[]';
+                    const savedComps = localStorage.getItem('todo_completions') || '{}';
+                    
+                    try { tasks.value = JSON.parse(savedTasks); } catch (e) { tasks.value = []; }
+                    try { completions.value = JSON.parse(savedComps); } catch (e) { completions.value = {}; }
+                };
+
                 // --- ☁️ 雲端同步核心邏輯 ---
                 const initFirebase = () => {
-                    if (firebaseConfig.apiKey === "你的_API_KEY_貼在這裡") {
-                        alert("⚠️ 請先將 GitHub 上的 firebaseConfig 替換為真實設定！目前先以本地模式執行。");
+                    // 如果使用者還沒換掉 firebaseConfig
+                    if (!firebaseConfig.databaseURL || firebaseConfig.apiKey.includes("你的_API_KEY")) {
+                        console.warn("未設定有效的 Firebase Config，自動切換為單機模式。");
+                        isCloudFailed.value = true;
                         showSyncModal.value = false;
-                        loadLocalData();
-                        return;
+                        return; // 不繼續連線雲端
                     }
+                    
                     if (!firebase.apps.length) {
-                        firebase.initializeApp(firebaseConfig);
+                        try {
+                            firebase.initializeApp(firebaseConfig);
+                        } catch(e) {
+                            console.error("Firebase 初始化失敗", e);
+                            isCloudFailed.value = true;
+                            return;
+                        }
                     }
                     
                     const db = firebase.database();
                     const userRef = db.ref('users/' + syncKey.value);
 
-                    // 監聽雲端資料變化
+                    // 監聽雲端資料變化 (如果失敗會觸發錯誤處理)
                     userRef.on('value', (snapshot) => {
                         isCloudConnected.value = true;
+                        isCloudFailed.value = false;
                         const data = snapshot.val();
                         if (data) {
                             tasks.value = data.tasks || [];
                             completions.value = data.completions || {};
+                            // 把雲端抓下來的資料，同步覆蓋一份到本地 (確保離線也能看)
+                            localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
+                            localStorage.setItem('todo_completions', JSON.stringify(completions.value));
                         } else {
-                            // 【無痛搬家機制】如果雲端是空的，把手機裡的資料傳上去
-                            migrateLocalToCloud();
+                            // 如果雲端是空的，把手機裡的資料傳上去
+                            saveToCloud();
                         }
+                    }, (error) => {
+                        console.error("雲端連線失敗/被拒絕:", error);
+                        isCloudConnected.value = false;
+                        isCloudFailed.value = true;
                     });
                 };
 
@@ -492,40 +519,24 @@
                     initFirebase();
                 };
 
-                const migrateLocalToCloud = () => {
-                    const oldTasks = localStorage.getItem('todo_repeat_tasks_v5') || localStorage.getItem('todo_repeat_tasks_v4') || '[]';
-                    const oldComps = localStorage.getItem('todo_completions') || '{}';
-                    const parsedTasks = JSON.parse(oldTasks);
-                    const parsedComps = JSON.parse(oldComps);
-                    
-                    if(parsedTasks.length > 0) {
-                        tasks.value = parsedTasks;
-                        completions.value = parsedComps;
-                        saveToCloud();
-                    } else {
-                        // 如果連本地都沒資料，給個預設值
-                        tasks.value = [
-                            { id: '1', type: 'fixed', title: 'Read AI news summary', repeatDays: [1, 2, 3, 4, 5, 6, 7], createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                            { id: '2', type: 'fixed', title: 'MOS Red-note post', repeatDays: [1, 3, 5], createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                            { id: '6', type: 'flexible', flexType: 'weekly', title: '去健身房運動', targetCount: 2, createdDate: '2020-01-01', endDate: null, skipDates: [] }
-                        ];
-                        saveToCloud();
-                    }
-                };
-
                 const saveToCloud = () => {
-                    if (!syncKey.value || !isCloudConnected.value) return;
-                    const db = firebase.database();
-                    db.ref('users/' + syncKey.value).set({
-                        tasks: tasks.value,
-                        completions: completions.value,
-                        lastUpdated: Date.now()
-                    });
-                };
-
-                const loadLocalData = () => {
-                    tasks.value = JSON.parse(localStorage.getItem('todo_repeat_tasks_v5') || '[]');
-                    completions.value = JSON.parse(localStorage.getItem('todo_completions') || '{}');
+                    // 先存一份本地
+                    localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
+                    localStorage.setItem('todo_completions', JSON.stringify(completions.value));
+                    
+                    // 如果有雲端且沒壞掉，再上傳
+                    if (!syncKey.value || isCloudFailed.value) return;
+                    
+                    try {
+                        const db = firebase.database();
+                        db.ref('users/' + syncKey.value).set({
+                            tasks: tasks.value,
+                            completions: completions.value,
+                            lastUpdated: Date.now()
+                        });
+                    } catch(e) {
+                        console.warn("上傳雲端失敗，已存於本地", e);
+                    }
                 };
 
                 const isActiveOnDate = (task, dateStr) => {
@@ -595,7 +606,7 @@
                 const toggleTask = (taskId, dateStr) => {
                     const key = `${dateStr}_${taskId}`;
                     completions.value = { ...completions.value, [key]: !completions.value[key] };
-                    saveToCloud(); // 改為存到雲端
+                    saveToCloud();
                 };
 
                 const isTaskCompleted = (taskId, dateStr) => !!completions.value[`${dateStr}_${taskId}`];
@@ -625,7 +636,7 @@
                         });
                         completions.value = newCompletions;
                     }
-                    saveToCloud(); // 改為存到雲端
+                    saveToCloud(); 
                     showDeleteModal.value = false;
                 };
 
@@ -664,7 +675,7 @@
                         newTask.targetCount = newTaskTargetCount.value;
                     }
                     tasks.value.push(newTask);
-                    saveToCloud(); // 改為存到雲端
+                    saveToCloud(); 
                     showAddModal.value = false;
                 };
 
@@ -678,7 +689,9 @@
 
                 const resetData = () => {
                     if (confirm('登出將清除此裝置的登入金鑰與暫存資料，確定嗎？（您的資料仍在雲端）')) {
-                        localStorage.clear();
+                        localStorage.removeItem('todo_sync_key');
+                        localStorage.removeItem('todo_repeat_tasks_v5');
+                        localStorage.removeItem('todo_completions');
                         window.location.reload();
                     }
                 };
@@ -690,6 +703,10 @@
                 
                 onMounted(() => {
                     document.body.style.backgroundColor = isDark.value ? '#1a1917' : '#f2f4f8';
+                    
+                    // 🌟 不管雲端有沒有連上，第一時間先把本地資料拿出來顯示！
+                    loadLocalData(); 
+
                     if (syncKey.value) {
                         initFirebase();
                     }
@@ -699,7 +716,7 @@
                     isDark, daysOfWeek, weekDaysWithDates, selectedDay, weekOffset,
                     selectedDayDateStr, viewedMonthYearStr, isToday, prevWeek, nextWeek, resetToToday,
                     tasks, currentFixedTasks, flexibleTasks, completedFixedCount, progressPercent, monthStats, getFlexibleProgress,
-                    showAddModal, showSettings, openAddModal, showSyncModal, syncKeyInput, saveSyncKey, syncKey, isCloudConnected,
+                    showAddModal, showSettings, openAddModal, showSyncModal, syncKeyInput, saveSyncKey, syncKey, isCloudConnected, isCloudFailed,
                     decreaseTarget, increaseTarget, newTaskType, newTaskTitle, newTaskDays, newTaskTargetCount,
                     toggleTask, isTaskCompleted, showDeleteModal, taskToDelete, openDeleteModal, confirmDelete,
                     toggleNewTaskDay, selectAllDays, selectWorkDays, addNewTask, getDayName, getRepeatText, resetData
