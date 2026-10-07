@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>重複待辦清單 (備份升級版)</title>
+    <title>重複待辦清單 (雲端同步版)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,14 +12,9 @@
             theme: {
                 extend: {
                     colors: {
-                        'sepia-bg': '#1a1917',
-                        'sepia-card': '#22201e',
-                        'sepia-border': '#363330',
-                        'sepia-accent': '#ffffff', 
-                        'sepia-text-dark': '#1a1917', 
-                        'sepia-dim': '#e3e3e3', 
-                        'sepia-flex': '#f3f4f6', 
-                        'sepia-month': '#e5e7eb'  
+                        'sepia-bg': '#1a1917', 'sepia-card': '#22201e', 'sepia-border': '#363330',
+                        'sepia-accent': '#ffffff', 'sepia-text-dark': '#1a1917', 'sepia-dim': '#e3e3e3', 
+                        'sepia-flex': '#f3f4f6', 'sepia-month': '#e5e7eb'  
                     }
                 }
             }
@@ -27,21 +22,42 @@
     </script>
     <!-- Vue 3 CDN -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
+    <script>
+        // =========================================================================
+        // 🔴🔴🔴 請將下方 firebaseConfig 的內容，替換成你剛剛在 Firebase 複製的設定！ 🔴🔴🔴
+        // =========================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCC6ah6dp2mMd2DqXzSVv-yVYaTY09-3Uc",
+            authDomain: "to-do-list-60632.firebaseapp.com",
+            databaseURL: "https://to-do-list-60632-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "to-do-list-60632",
+            storageBucket: "to-do-list-60632.firebasestorage.app",
+            messagingSenderId: "288681866346",
+            appId: "1:288681866346:web:7a7729ce45c85826fc8613"
+            measurementId: "G-PWY621RE08"
+        };
+        // =========================================================================
+    </script>
+
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; transition: background-color 0.4s ease; background-color: #1a1917; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .theme-light { background-color: #f2f4f8; color: #1c1c1e; }
         .theme-light .glass-card { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); }
-        .theme-light .glass-pill { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.85); }
+        .theme-light .glass-pill { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.85); }
         .theme-light .glass-input { background: rgba(240, 243, 248, 0.75); border: 1px solid rgba(255, 255, 255, 0.85); color: #1c1c1e; }
         .theme-light .glass-modal { background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.95); }
         .theme-dark { background-color: #1a1917 !important; color: #ffffff !important; }
-        .theme-dark .glass-card { background: #22201e !important; backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid #363330 !important; box-shadow: none; }
-        .theme-dark .glass-pill { background: #2a2725 !important; backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid #363330 !important; }
+        .theme-dark .glass-card { background: #22201e !important; border: 1px solid #363330 !important; }
+        .theme-dark .glass-pill { background: #2a2725 !important; border: 1px solid #363330 !important; }
         .theme-dark .glass-input { background: #1a1917 !important; border: 1px solid #363330 !important; color: #ffffff !important; }
         .theme-dark .glass-input::placeholder { color: #e3e3e3 !important; opacity: 0.7; }
-        .theme-dark .glass-modal { background: #22201e !important; backdrop-filter: none; border: 1px solid #363330 !important; box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.7); }
+        .theme-dark .glass-modal { background: #22201e !important; border: 1px solid #363330 !important; box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.7); }
         .ambient-blob { position: fixed; border-radius: 50%; filter: blur(75px); z-index: 0; pointer-events: none; transition: all 0.8s ease; }
         .checkbox-bounce { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, border-color 0.2s; }
         .checkbox-bounce:active { transform: scale(0.85); }
@@ -49,12 +65,21 @@
 </head>
 <body class="transition-colors duration-500 min-h-screen">
     <div id="app" :class="[isDark ? 'dark theme-dark' : 'theme-light']" class="min-h-screen relative overflow-x-hidden pb-32 transition-colors duration-300">
+        
         <div v-if="!isDark" class="ambient-blob w-72 h-72 bg-blue-300/40 -top-10 -left-10"></div>
         <div v-if="!isDark" class="ambient-blob w-80 h-80 bg-purple-300/35 top-1/3 -right-20"></div>
         <div v-if="!isDark" class="ambient-blob w-72 h-72 bg-pink-200/40 bottom-10 left-10"></div>
 
         <div class="max-w-md mx-auto min-h-screen relative z-10 px-4 pt-8 pb-12 flex flex-col justify-between">
             <header>
+                <!-- 雲端狀態列 -->
+                <div v-if="syncKey" class="flex justify-center mb-3">
+                    <span class="text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 transition-colors" :class="isCloudConnected ? (isDark ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-green-100 text-green-600') : (isDark ? 'bg-yellow-500/10 text-yellow-400' : 'bg-yellow-100 text-yellow-600')">
+                        <span class="w-1.5 h-1.5 rounded-full" :class="isCloudConnected ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'"></span>
+                        {{ isCloudConnected ? '已連接雲端同步' : '雲端連線中...' }}
+                    </span>
+                </div>
+
                 <div class="flex items-center justify-between mb-5">
                     <div class="flex items-center space-x-2">
                         <button @click="prevWeek" class="glass-pill w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition opacity-80 hover:opacity-100" :class="isDark ? 'text-white' : ''">
@@ -127,16 +152,15 @@
             </header>
 
             <main class="flex-1 mb-6">
+                <!-- 固定待辦事項 -->
                 <div class="mb-8">
                     <div class="flex items-center justify-between mb-3 px-1">
                         <h3 class="text-sm font-semibold" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">{{ getDayName(selectedDay) }} 固定事項 ({{ currentFixedTasks.length }})</h3>
                         <span v-if="isToday" class="text-xs px-2.5 py-0.5 rounded-full font-medium transition-colors" :class="isDark ? 'bg-white/10 text-white' : 'bg-blue-500/10 text-blue-500'">今天</span>
                     </div>
-
                     <div v-if="currentFixedTasks.length === 0" class="glass-card p-6 rounded-3xl text-center my-4" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">
                         <p class="text-sm font-medium">這天沒有固定排程事項</p>
                     </div>
-
                     <div class="space-y-3">
                         <div v-for="task in currentFixedTasks" :key="`${selectedDayDateStr}_${task.id}`" class="glass-card p-4 rounded-2xl flex items-center justify-between transition-all duration-300" :class="{'opacity-50': isTaskCompleted(task.id, selectedDayDateStr)}">
                             <div class="flex items-center space-x-3.5 flex-1 min-w-0">
@@ -155,6 +179,7 @@
                     </div>
                 </div>
 
+                <!-- 彈性目標 -->
                 <div v-if="flexibleTasks.length > 0">
                     <div class="flex items-center justify-between mb-3 px-1">
                         <div class="flex items-center gap-2">
@@ -162,7 +187,6 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 transition-colors" :class="isDark ? 'text-[#e3e3e3]' : 'text-orange-500'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="m17 5-5-3-5 3"></path><path d="m17 19-5 3-5-3"></path><path d="M2 12h20"></path><path d="m5 7 3 5-3 5"></path><path d="m19 7-3 5 3 5"></path></svg>
                         </div>
                     </div>
-
                     <div class="space-y-3">
                         <div v-for="task in flexibleTasks" :key="`${selectedDayDateStr}_${task.id}`" class="glass-card p-4 rounded-2xl flex items-center justify-between transition-all duration-300" :class="getFlexibleProgress(task) >= task.targetCount ? (isDark ? 'border-gray-500/50' : 'border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.1)]') : ''">
                             <div class="flex items-center space-x-3.5 flex-1 min-w-0">
@@ -198,6 +222,25 @@
                 </button>
             </div>
 
+            <!-- 雲端同步綁定 Modal -->
+            <div v-if="showSyncModal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity" :class="isDark ? 'bg-black/90' : 'bg-black/70 backdrop-blur-sm'">
+                <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all duration-300">
+                    <div class="text-center mb-6 mt-2">
+                        <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" :class="isDark ? 'bg-white/10' : 'bg-blue-50'">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" :class="isDark ? 'text-white' : 'text-blue-500'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold tracking-tight mb-2" :class="isDark ? 'text-white' : ''">設定雲端同步金鑰</h3>
+                        <p class="text-sm" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">請為您的帳號設定一組專屬「金鑰密碼」。未來換手機時，只要輸入同一個金鑰，資料就會自動同步回來！</p>
+                    </div>
+                    <form @submit.prevent="saveSyncKey">
+                        <div class="mb-5">
+                            <input v-model="syncKeyInput" type="text" placeholder="例如：my-secret-key-2026" class="glass-input w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-base text-center font-mono" :class="isDark ? 'focus:ring-white/50 text-white placeholder-gray-500' : 'focus:ring-blue-500'" required>
+                        </div>
+                        <button type="submit" class="w-full py-3.5 rounded-xl font-semibold active:scale-95 transition text-sm" :class="isDark ? 'bg-white text-[#1a1917] shadow-none' : 'bg-blue-600 text-white shadow-md'">開始雲端同步</button>
+                    </form>
+                </div>
+            </div>
+
             <!-- 新增事項 Modal -->
             <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity" :class="isDark ? 'bg-black/80' : 'bg-black/70 backdrop-blur-sm'">
                 <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all duration-300 max-h-[90vh] overflow-y-auto">
@@ -217,7 +260,7 @@
                     <form @submit.prevent="addNewTask">
                         <div class="mb-5">
                             <label class="block text-xs font-semibold uppercase mb-2" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">事項名稱</label>
-                            <input v-model="newTaskTitle" type="text" placeholder="例如：打高爾夫球、去健身房..." class="glass-input w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 text-base" :class="isDark ? 'focus:ring-white/50 text-white placeholder-gray-500' : 'focus:ring-blue-500'" required>
+                            <input v-model="newTaskTitle" type="text" placeholder="例如：打高爾夫球..." class="glass-input w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 text-base" :class="isDark ? 'focus:ring-white/50 text-white placeholder-gray-500' : 'focus:ring-blue-500'" required>
                         </div>
 
                         <div v-if="newTaskType === 'fixed'" class="mb-6">
@@ -239,7 +282,7 @@
                         <div v-if="newTaskType.startsWith('flexible')" class="mb-6 p-4 rounded-xl flex justify-between items-center border" :class="isDark ? 'bg-[#131314] border-[#333537]' : 'bg-black/5 border-black/5'">
                             <div>
                                 <label class="block text-sm font-semibold" :class="isDark ? 'text-white' : ''">目標次數 ({{ newTaskType === 'flexible_week' ? '每週' : '每月' }})</label>
-                                <p class="text-[10px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">不必指定日期，期間內完成即可</p>
+                                <p class="text-[10px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">期間內完成即可</p>
                             </div>
                             <div class="flex items-center space-x-4">
                                 <button type="button" @click="decreaseTarget" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/10'">
@@ -247,16 +290,14 @@
                                 </button>
                                 <span class="text-xl font-bold w-4 text-center" :class="isDark ? 'text-white' : ''">{{ newTaskTargetCount }}</span>
                                 <button type="button" @click="increaseTarget" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/10'">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                 </button>
                             </div>
                         </div>
                         
-                        <p class="text-[10px] mb-4 text-center" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-50'">💡 事項將從您目前檢視的日期 ({{ selectedDayDateStr }}) 起生效。</p>
-
-                        <div class="flex gap-3">
+                        <div class="flex gap-3 mt-4">
                             <button type="button" @click="showAddModal = false" class="flex-1 py-3.5 rounded-xl glass-pill font-semibold active:scale-95 transition text-sm" :class="isDark ? 'text-white' : ''">取消</button>
-                            <button type="submit" class="flex-1 py-3.5 rounded-xl font-semibold shadow-md active:scale-95 transition text-sm text-white" :class="newTaskType === 'fixed' ? (isDark ? 'bg-[#333537] shadow-none' : 'bg-blue-600') : (isDark ? 'bg-[#333537] shadow-none' : 'bg-orange-600')">儲存事項</button>
+                            <button type="submit" class="flex-1 py-3.5 rounded-xl font-semibold shadow-md active:scale-95 transition text-sm text-white" :class="isDark ? 'bg-[#333537] shadow-none' : 'bg-blue-600'">儲存事項</button>
                         </div>
                     </form>
                 </div>
@@ -294,30 +335,20 @@
                 </div>
             </div>
 
-            <!-- 設定 Modal (含備份還原) -->
+            <!-- 設定 Modal -->
             <div v-if="showSettings" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity" :class="isDark ? 'bg-black/80' : 'bg-black/70 backdrop-blur-sm'">
-                <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all duration-300 max-h-[90vh] overflow-y-auto">
+                <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all duration-300">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold tracking-tight" :class="isDark ? 'text-white' : ''">偏好設定</h3>
                         <button @click="showSettings = false" class="p-2 opacity-60 hover:opacity-100 rounded-full" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/5'">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </div>
-
-                    <!-- 資料備份與安全區塊 -->
-                    <div class="mb-6">
-                        <label class="block text-xs font-semibold uppercase mb-3" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">資料備份與安全</label>
-                        <div class="space-y-3">
-                            <button @click="exportData" class="w-full py-3 rounded-xl border transition flex items-center justify-center space-x-2" :class="isDark ? 'bg-[#131314] hover:bg-[#282a2c] border-[#333537] text-white' : 'bg-white hover:bg-blue-50 border-blue-200 text-blue-600'">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                <span class="font-semibold text-sm">複製備份代碼 (匯出)</span>
-                            </button>
-                            <button @click="importData" class="w-full py-3 rounded-xl border transition flex items-center justify-center space-x-2" :class="isDark ? 'bg-[#131314] hover:bg-[#282a2c] border-[#333537] text-[#e3e3e3]' : 'bg-black/5 hover:bg-black/10 border-black/10 text-black'">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                <span class="font-semibold text-sm">貼上備份代碼 (匯入)</span>
-                            </button>
-                        </div>
-                        <p class="text-[10px] mt-2 text-center" :class="isDark ? 'text-sepia-dim' : 'opacity-60'">建議定期匯出代碼並保存在「備忘錄」，以防資料遺失。</p>
+                    
+                    <div class="mb-6 bg-black/5 dark:bg-[#131314] border border-black/5 dark:border-[#333537] rounded-xl p-4">
+                        <p class="text-sm font-semibold mb-1" :class="isDark ? 'text-white' : ''">🔑 目前同步金鑰</p>
+                        <p class="text-xs font-mono break-all" :class="isDark ? 'text-green-400' : 'text-green-600'">{{ syncKey }}</p>
+                        <p class="text-[10px] mt-1.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">在新設備輸入此金鑰即可登入。</p>
                     </div>
 
                     <div class="mb-6">
@@ -335,9 +366,9 @@
                     </div>
 
                     <div class="space-y-3 pt-2">
-                        <button @click="resetToDefaultTasks" class="w-full py-3 rounded-xl border border-red-500/30 text-red-500 text-sm font-medium hover:bg-red-500/10 transition flex items-center justify-center space-x-2">
+                        <button @click="resetData" class="w-full py-3 rounded-xl border border-red-500/30 text-red-500 text-sm font-medium hover:bg-red-500/10 transition flex items-center justify-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-                            <span>清除所有紀錄並重置範例</span>
+                            <span>登出並清除手機暫存資料</span>
                         </button>
                     </div>
 
@@ -353,7 +384,11 @@
         createApp({
             setup() {
                 const isDark = ref(localStorage.getItem('theme_dark') === 'true');
-                
+                const syncKey = ref(localStorage.getItem('todo_sync_key') || '');
+                const showSyncModal = ref(!syncKey.value);
+                const syncKeyInput = ref('');
+                const isCloudConnected = ref(false);
+
                 const daysOfWeek = [
                     { value: 1, label: '一', shortLabel: 'Mon' }, { value: 2, label: '二', shortLabel: 'Tue' },
                     { value: 3, label: '三', shortLabel: 'Wed' }, { value: 4, label: '四', shortLabel: 'Thu' },
@@ -417,81 +452,80 @@
                 const nextWeek = () => weekOffset.value++;
                 const resetToToday = () => { weekOffset.value = 0; selectedDay.value = getRealTodayDayValue(); };
 
-                // 任務資料結構 (v5: 加入了 flexType: 'weekly' 或 'monthly', targetCount)
-                const defaultTasks = [
-                    { id: '1', type: 'fixed', title: 'Read AI news summary', repeatDays: [1, 2, 3, 4, 5, 6, 7], createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                    { id: '2', type: 'fixed', title: 'MOS Red-note post', repeatDays: [1, 3, 5], createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                    { id: '6', type: 'flexible', flexType: 'weekly', title: '去健身房運動', targetCount: 2, createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                    { id: '7', type: 'flexible', flexType: 'monthly', title: '去打高爾夫球', targetCount: 2, createdDate: '2020-01-01', endDate: null, skipDates: [] }
-                ];
-
                 const tasks = ref([]);
                 const completions = ref({});
 
-                const loadData = () => {
-                    let savedTasks = localStorage.getItem('todo_repeat_tasks_v5'); // 升級為 v5 以支援每月目標
-                    if (savedTasks) {
-                        try { tasks.value = JSON.parse(savedTasks); } catch (e) { tasks.value = defaultTasks; }
-                    } else {
-                        // 平滑升級舊資料
-                        const oldTasks = localStorage.getItem('todo_repeat_tasks_v4') || localStorage.getItem('todo_repeat_tasks_v3');
-                        if (oldTasks) {
-                            try {
-                                const parsed = JSON.parse(oldTasks);
-                                tasks.value = parsed.map(t => {
-                                    if(t.type === 'flexible') {
-                                        return {...t, flexType: t.flexType || 'weekly', targetCount: t.targetCount || t.weeklyTarget || 1};
-                                    }
-                                    return t;
-                                });
-                                localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
-                            } catch(e) { tasks.value = defaultTasks; }
-                        } else {
-                            tasks.value = defaultTasks;
-                        }
+                // --- ☁️ 雲端同步核心邏輯 ---
+                const initFirebase = () => {
+                    if (firebaseConfig.apiKey === "你的_API_KEY_貼在這裡") {
+                        alert("⚠️ 請先將 GitHub 上的 firebaseConfig 替換為真實設定！目前先以本地模式執行。");
+                        showSyncModal.value = false;
+                        loadLocalData();
+                        return;
                     }
-
-                    const savedCompletions = localStorage.getItem('todo_completions');
-                    if (savedCompletions) {
-                        try { completions.value = JSON.parse(savedCompletions); } catch (e) { completions.value = {}; }
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
                     }
-                };
-
-                // --- 備份與還原功能 (Export/Import) ---
-                const exportData = () => {
-                    const tasksData = localStorage.getItem('todo_repeat_tasks_v5') || '[]';
-                    const completionsData = localStorage.getItem('todo_completions') || '{}';
-                    const backupObj = { tasks: JSON.parse(tasksData), completions: JSON.parse(completionsData), version: 'v5' };
-                    const backupStr = JSON.stringify(backupObj);
                     
-                    try {
-                        navigator.clipboard.writeText(backupStr).then(() => {
-                            alert('✅ 備份代碼已成功複製！請立刻去「備忘錄」貼上並安全保存。');
-                        }).catch(() => {
-                            prompt('無法自動複製，請手動全選並複製以下代碼：', backupStr);
-                        });
-                    } catch(e) {
-                        prompt('請手動全選並複製以下代碼：', backupStr);
+                    const db = firebase.database();
+                    const userRef = db.ref('users/' + syncKey.value);
+
+                    // 監聽雲端資料變化
+                    userRef.on('value', (snapshot) => {
+                        isCloudConnected.value = true;
+                        const data = snapshot.val();
+                        if (data) {
+                            tasks.value = data.tasks || [];
+                            completions.value = data.completions || {};
+                        } else {
+                            // 【無痛搬家機制】如果雲端是空的，把手機裡的資料傳上去
+                            migrateLocalToCloud();
+                        }
+                    });
+                };
+
+                const saveSyncKey = () => {
+                    if (!syncKeyInput.value.trim()) return;
+                    syncKey.value = syncKeyInput.value.trim();
+                    localStorage.setItem('todo_sync_key', syncKey.value);
+                    showSyncModal.value = false;
+                    initFirebase();
+                };
+
+                const migrateLocalToCloud = () => {
+                    const oldTasks = localStorage.getItem('todo_repeat_tasks_v5') || localStorage.getItem('todo_repeat_tasks_v4') || '[]';
+                    const oldComps = localStorage.getItem('todo_completions') || '{}';
+                    const parsedTasks = JSON.parse(oldTasks);
+                    const parsedComps = JSON.parse(oldComps);
+                    
+                    if(parsedTasks.length > 0) {
+                        tasks.value = parsedTasks;
+                        completions.value = parsedComps;
+                        saveToCloud();
+                    } else {
+                        // 如果連本地都沒資料，給個預設值
+                        tasks.value = [
+                            { id: '1', type: 'fixed', title: 'Read AI news summary', repeatDays: [1, 2, 3, 4, 5, 6, 7], createdDate: '2020-01-01', endDate: null, skipDates: [] },
+                            { id: '2', type: 'fixed', title: 'MOS Red-note post', repeatDays: [1, 3, 5], createdDate: '2020-01-01', endDate: null, skipDates: [] },
+                            { id: '6', type: 'flexible', flexType: 'weekly', title: '去健身房運動', targetCount: 2, createdDate: '2020-01-01', endDate: null, skipDates: [] }
+                        ];
+                        saveToCloud();
                     }
                 };
 
-                const importData = () => {
-                    const backupStr = prompt('📥 請在下方貼上您之前保存的備份代碼：');
-                    if (!backupStr) return;
-                    try {
-                        const backupObj = JSON.parse(backupStr);
-                        if (backupObj && backupObj.tasks && backupObj.completions) {
-                            localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(backupObj.tasks));
-                            localStorage.setItem('todo_completions', JSON.stringify(backupObj.completions));
-                            loadData(); // 重新讀取
-                            showSettings.value = false;
-                            alert('🎉 恭喜！所有資料已成功還原！');
-                        } else {
-                            alert('❌ 備份代碼格式錯誤，請確認是否有漏複製文字。');
-                        }
-                    } catch (e) {
-                        alert('❌ 無法解析代碼，請確認這是一段有效的備份代碼。');
-                    }
+                const saveToCloud = () => {
+                    if (!syncKey.value || !isCloudConnected.value) return;
+                    const db = firebase.database();
+                    db.ref('users/' + syncKey.value).set({
+                        tasks: tasks.value,
+                        completions: completions.value,
+                        lastUpdated: Date.now()
+                    });
+                };
+
+                const loadLocalData = () => {
+                    tasks.value = JSON.parse(localStorage.getItem('todo_repeat_tasks_v5') || '[]');
+                    completions.value = JSON.parse(localStorage.getItem('todo_completions') || '{}');
                 };
 
                 const isActiveOnDate = (task, dateStr) => {
@@ -501,30 +535,15 @@
                     return true;
                 };
 
-                const currentFixedTasks = computed(() => {
-                    return tasks.value.filter(t => (t.type || 'fixed') === 'fixed' && t.repeatDays.includes(selectedDay.value) && isActiveOnDate(t, selectedDayDateStr.value));
-                });
+                const currentFixedTasks = computed(() => tasks.value.filter(t => (t.type || 'fixed') === 'fixed' && t.repeatDays.includes(selectedDay.value) && isActiveOnDate(t, selectedDayDateStr.value)));
+                const flexibleTasks = computed(() => tasks.value.filter(t => t.type === 'flexible' && isActiveOnDate(t, selectedDayDateStr.value)));
+                const completedFixedCount = computed(() => currentFixedTasks.value.filter(task => completions.value[`${selectedDayDateStr.value}_${task.id}`]).length);
+                const progressPercent = computed(() => currentFixedTasks.value.length === 0 ? 100 : Math.round((completedFixedCount.value / currentFixedTasks.value.length) * 100));
 
-                const flexibleTasks = computed(() => {
-                    return tasks.value.filter(t => t.type === 'flexible' && isActiveOnDate(t, selectedDayDateStr.value));
-                });
-
-                const completedFixedCount = computed(() => {
-                    return currentFixedTasks.value.filter(task => completions.value[`${selectedDayDateStr.value}_${task.id}`]).length;
-                });
-                
-                const progressPercent = computed(() => {
-                    if (currentFixedTasks.value.length === 0) return 100;
-                    return Math.round((completedFixedCount.value / currentFixedTasks.value.length) * 100);
-                });
-
-                // 計算彈性目標完成次數 (支援每週/每月)
                 const getFlexibleProgress = (task) => {
                     let count = 0;
                     const dateArray = task.flexType === 'monthly' ? currentMonthDateStrings.value : currentWeekDateStrings.value;
-                    dateArray.forEach(dateStr => {
-                        if (completions.value[`${dateStr}_${task.id}`]) count++;
-                    });
+                    dateArray.forEach(dateStr => { if (completions.value[`${dateStr}_${task.id}`]) count++; });
                     return count;
                 };
 
@@ -538,29 +557,21 @@
                     let completedMonthTasks = 0;
 
                     for (let day = 1; day <= daysInMonth; day++) {
-                        const dateObj = new Date(year, month, day);
-                        const dateStr = formatDateStr(dateObj);
-                        let dayVal = dateObj.getDay();
-                        if (dayVal === 0) dayVal = 7;
+                        const dateStr = formatDateStr(new Date(year, month, day));
+                        let dayVal = new Date(year, month, day).getDay() || 7;
 
                         const fixedForDay = tasks.value.filter(t => (t.type || 'fixed') === 'fixed' && t.repeatDays.includes(dayVal) && isActiveOnDate(t, dateStr));
                         totalMonthTasks += fixedForDay.length;
-
-                        fixedForDay.forEach(t => {
-                            if (completions.value[`${dateStr}_${t.id}`]) completedMonthTasks++;
-                        });
+                        fixedForDay.forEach(t => { if (completions.value[`${dateStr}_${t.id}`]) completedMonthTasks++; });
                     }
 
-                    // 計算彈性目標預估總數 (每週的換算，每月的直接加)
                     let flexTotalMonthly = 0;
                     tasks.value.filter(t => t.type === 'flexible').forEach(t => {
                         let activeDaysInMonth = 0;
                         for (let day = 1; day <= daysInMonth; day++) {
-                            const dateObj = new Date(year, month, day);
-                            if (isActiveOnDate(t, formatDateStr(dateObj))) activeDaysInMonth++;
+                            if (isActiveOnDate(t, formatDateStr(new Date(year, month, day)))) activeDaysInMonth++;
                         }
                         if(t.flexType === 'monthly') {
-                            // 如果當月有超過一半的時間生效，就算入完整次數
                             if(activeDaysInMonth > (daysInMonth/2)) flexTotalMonthly += t.targetCount;
                         } else {
                             flexTotalMonthly += Math.round((activeDaysInMonth / 7) * t.targetCount);
@@ -571,11 +582,9 @@
                     const flexIds = tasks.value.filter(t => t.type === 'flexible').map(t => t.id);
                     const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
                     Object.keys(completions.value).forEach(key => {
-                        if (completions.value[key]) {
-                            const parts = key.split('_');
-                            if (parts.length >= 2 && parts[0].startsWith(monthPrefix) && flexIds.includes(parts[1])) {
-                                completedMonthTasks++;
-                            }
+                        if (completions.value[key] && key.startsWith(monthPrefix)) {
+                            const tid = key.split('_')[1];
+                            if (flexIds.includes(tid)) completedMonthTasks++;
                         }
                     });
 
@@ -586,7 +595,7 @@
                 const toggleTask = (taskId, dateStr) => {
                     const key = `${dateStr}_${taskId}`;
                     completions.value = { ...completions.value, [key]: !completions.value[key] };
-                    localStorage.setItem('todo_completions', JSON.stringify(completions.value));
+                    saveToCloud(); // 改為存到雲端
                 };
 
                 const isTaskCompleted = (taskId, dateStr) => !!completions.value[`${dateStr}_${taskId}`];
@@ -594,10 +603,7 @@
                 const showDeleteModal = ref(false);
                 const taskToDelete = ref(null);
 
-                const openDeleteModal = (task) => {
-                    taskToDelete.value = task;
-                    showDeleteModal.value = true;
-                };
+                const openDeleteModal = (task) => { taskToDelete.value = task; showDeleteModal.value = true; };
 
                 const confirmDelete = (deleteType) => {
                     if(!taskToDelete.value) return;
@@ -606,7 +612,6 @@
                     if(taskIndex === -1) return;
 
                     const currentDateStr = selectedDayDateStr.value;
-
                     if (deleteType === 'single') {
                         if (!tasks.value[taskIndex].skipDates) tasks.value[taskIndex].skipDates = [];
                         tasks.value[taskIndex].skipDates.push(currentDateStr);
@@ -619,17 +624,14 @@
                             if (!key.endsWith(`_${taskId}`)) { newCompletions[key] = completions.value[key]; }
                         });
                         completions.value = newCompletions;
-                        localStorage.setItem('todo_completions', JSON.stringify(completions.value));
                     }
-
-                    localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
+                    saveToCloud(); // 改為存到雲端
                     showDeleteModal.value = false;
-                    taskToDelete.value = null;
                 };
 
                 const showAddModal = ref(false);
                 const showSettings = ref(false);
-                const newTaskType = ref('fixed'); // fixed, flexible_week, flexible_month
+                const newTaskType = ref('fixed');
                 const newTaskTitle = ref('');
                 const newTaskDays = ref([selectedDay.value]);
                 const newTaskTargetCount = ref(2);
@@ -638,19 +640,13 @@
                 const increaseTarget = () => { if(newTaskTargetCount.value < 31) newTaskTargetCount.value++; };
 
                 const openAddModal = () => {
-                    newTaskTitle.value = '';
-                    newTaskType.value = 'fixed';
-                    newTaskDays.value = [selectedDay.value];
-                    newTaskTargetCount.value = 2;
-                    showAddModal.value = true;
+                    newTaskTitle.value = ''; newTaskType.value = 'fixed'; newTaskDays.value = [selectedDay.value]; newTaskTargetCount.value = 2; showAddModal.value = true;
                 };
 
                 const toggleNewTaskDay = (dayVal) => {
                     if (newTaskDays.value.includes(dayVal)) {
                         if (newTaskDays.value.length > 1) newTaskDays.value = newTaskDays.value.filter(d => d !== dayVal);
-                    } else {
-                        newTaskDays.value.push(dayVal);
-                    }
+                    } else { newTaskDays.value.push(dayVal); }
                 };
                 const selectAllDays = () => newTaskDays.value = [1, 2, 3, 4, 5, 6, 7];
                 const selectWorkDays = () => newTaskDays.value = [1, 2, 3, 4, 5];
@@ -658,31 +654,21 @@
                 const addNewTask = () => {
                     if (!newTaskTitle.value.trim()) return;
                     const newTask = {
-                        id: Date.now().toString(),
-                        type: newTaskType.value === 'fixed' ? 'fixed' : 'flexible',
-                        title: newTaskTitle.value.trim(),
-                        createdDate: selectedDayDateStr.value,
-                        endDate: null,
-                        skipDates: []
+                        id: Date.now().toString(), type: newTaskType.value === 'fixed' ? 'fixed' : 'flexible',
+                        title: newTaskTitle.value.trim(), createdDate: selectedDayDateStr.value, endDate: null, skipDates: []
                     };
-                    
                     if (newTaskType.value === 'fixed') {
                         newTask.repeatDays = [...newTaskDays.value].sort();
                     } else {
                         newTask.flexType = newTaskType.value === 'flexible_week' ? 'weekly' : 'monthly';
                         newTask.targetCount = newTaskTargetCount.value;
                     }
-
                     tasks.value.push(newTask);
-                    localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
+                    saveToCloud(); // 改為存到雲端
                     showAddModal.value = false;
                 };
 
-                const getDayName = (dayVal) => {
-                    const d = daysOfWeek.find(item => item.value === dayVal);
-                    return d ? `星期${d.label}` : '';
-                };
-
+                const getDayName = (dayVal) => { const d = daysOfWeek.find(item => item.value === dayVal); return d ? `星期${d.label}` : ''; };
                 const getRepeatText = (repeatDays) => {
                     if (repeatDays.length === 7) return '每日重複';
                     if (JSON.stringify(repeatDays) === JSON.stringify([1, 2, 3, 4, 5])) return '逢工作日 (一至五)';
@@ -690,14 +676,10 @@
                     return `逢星期${repeatDays.map(d => daysOfWeek.find(dw => dw.value === d)?.label).join('、')}`;
                 };
 
-                const resetToDefaultTasks = () => {
-                    if (confirm('警告：這將會清除您所有的歷史紀錄並重置為範例任務，確定嗎？')) {
-                        tasks.value = [...defaultTasks];
-                        localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
-                        completions.value = {};
-                        localStorage.removeItem('todo_completions');
-                        showSettings.value = false;
-                        resetToToday();
+                const resetData = () => {
+                    if (confirm('登出將清除此裝置的登入金鑰與暫存資料，確定嗎？（您的資料仍在雲端）')) {
+                        localStorage.clear();
+                        window.location.reload();
                     }
                 };
 
@@ -707,24 +689,20 @@
                 });
                 
                 onMounted(() => {
-                    loadData();
                     document.body.style.backgroundColor = isDark.value ? '#1a1917' : '#f2f4f8';
+                    if (syncKey.value) {
+                        initFirebase();
+                    }
                 });
 
                 return {
                     isDark, daysOfWeek, weekDaysWithDates, selectedDay, weekOffset,
-                    selectedDayDateStr, viewedMonthYearStr, isToday,
-                    prevWeek, nextWeek, resetToToday,
-                    tasks, currentFixedTasks, flexibleTasks,
-                    completedFixedCount, progressPercent, monthStats, getFlexibleProgress,
-                    showAddModal, showSettings, openAddModal,
-                    exportData, importData, // 匯出與匯入功能
-                    decreaseTarget, increaseTarget,
-                    newTaskType, newTaskTitle, newTaskDays, newTaskTargetCount,
-                    toggleTask, isTaskCompleted, 
-                    showDeleteModal, taskToDelete, openDeleteModal, confirmDelete,
-                    toggleNewTaskDay, selectAllDays, selectWorkDays, addNewTask,
-                    getDayName, getRepeatText, resetToDefaultTasks
+                    selectedDayDateStr, viewedMonthYearStr, isToday, prevWeek, nextWeek, resetToToday,
+                    tasks, currentFixedTasks, flexibleTasks, completedFixedCount, progressPercent, monthStats, getFlexibleProgress,
+                    showAddModal, showSettings, openAddModal, showSyncModal, syncKeyInput, saveSyncKey, syncKey, isCloudConnected,
+                    decreaseTarget, increaseTarget, newTaskType, newTaskTitle, newTaskDays, newTaskTargetCount,
+                    toggleTask, isTaskCompleted, showDeleteModal, taskToDelete, openDeleteModal, confirmDelete,
+                    toggleNewTaskDay, selectAllDays, selectWorkDays, addNewTask, getDayName, getRepeatText, resetData
                 };
             }
         }).mount('#app');
