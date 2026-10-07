@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>重複待辦清單 (完美雙主題)</title>
+    <title>重複待辦清單 (備份升級版)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // 設定 Tailwind 使用 class 模式與自定義顏色
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -29,124 +28,38 @@
     <!-- Vue 3 CDN -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
-        /* iOS SF Pro 風格字型與基礎重置 */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            transition: background-color 0.4s ease;
-        }
-
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* --- 淺色液態玻璃風格 (黑字) --- */
-        .theme-light {
-            background-color: #f2f4f8;
-            color: #1c1c1e;
-        }
-        .theme-light .glass-card {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-        }
-        .theme-light .glass-pill {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.85);
-        }
-        .theme-light .glass-input {
-            background: rgba(240, 243, 248, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.85);
-            color: #1c1c1e;
-        }
-        .theme-light .glass-modal {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.95);
-        }
-
-        /* --- 🟢 終極 Gemini 極致深黑風格 (白字) --- */
-        .theme-dark {
-            background-color: #1a1917 !important; 
-            color: #ffffff !important;
-        }
-        .theme-dark .glass-card {
-            background: #22201e !important; 
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            border: 1px solid #363330 !important;
-            box-shadow: none; 
-        }
-        .theme-dark .glass-pill {
-            background: #2a2725 !important;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            border: 1px solid #363330 !important;
-        }
-        .theme-dark .glass-input {
-            background: #1a1917 !important;
-            border: 1px solid #363330 !important;
-            color: #ffffff !important;
-        }
-        .theme-dark .glass-input::placeholder {
-            color: #e3e3e3 !important;
-            opacity: 0.7;
-        }
-        .theme-dark .glass-modal {
-            background: #22201e !important;
-            backdrop-filter: none;
-            border: 1px solid #363330 !important;
-            box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.7);
-        }
-
-        /* 液態流光背景球 */
-        .ambient-blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(75px);
-            z-index: 0;
-            pointer-events: none;
-            transition: all 0.8s ease;
-        }
-
-        /* 打勾縮放微互動 */
-        .checkbox-bounce {
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, border-color 0.2s;
-        }
-        .checkbox-bounce:active {
-            transform: scale(0.85);
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; transition: background-color 0.4s ease; background-color: #1a1917; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .theme-light { background-color: #f2f4f8; color: #1c1c1e; }
+        .theme-light .glass-card { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05); }
+        .theme-light .glass-pill { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.85); }
+        .theme-light .glass-input { background: rgba(240, 243, 248, 0.75); border: 1px solid rgba(255, 255, 255, 0.85); color: #1c1c1e; }
+        .theme-light .glass-modal { background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.95); }
+        .theme-dark { background-color: #1a1917 !important; color: #ffffff !important; }
+        .theme-dark .glass-card { background: #22201e !important; backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid #363330 !important; box-shadow: none; }
+        .theme-dark .glass-pill { background: #2a2725 !important; backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid #363330 !important; }
+        .theme-dark .glass-input { background: #1a1917 !important; border: 1px solid #363330 !important; color: #ffffff !important; }
+        .theme-dark .glass-input::placeholder { color: #e3e3e3 !important; opacity: 0.7; }
+        .theme-dark .glass-modal { background: #22201e !important; backdrop-filter: none; border: 1px solid #363330 !important; box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.7); }
+        .ambient-blob { position: fixed; border-radius: 50%; filter: blur(75px); z-index: 0; pointer-events: none; transition: all 0.8s ease; }
+        .checkbox-bounce { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, border-color 0.2s; }
+        .checkbox-bounce:active { transform: scale(0.85); }
     </style>
 </head>
 <body class="transition-colors duration-500 min-h-screen">
     <div id="app" :class="[isDark ? 'dark theme-dark' : 'theme-light']" class="min-h-screen relative overflow-x-hidden pb-32 transition-colors duration-300">
-        
-        <!-- 背景液態模糊光暈 -->
         <div v-if="!isDark" class="ambient-blob w-72 h-72 bg-blue-300/40 -top-10 -left-10"></div>
         <div v-if="!isDark" class="ambient-blob w-80 h-80 bg-purple-300/35 top-1/3 -right-20"></div>
         <div v-if="!isDark" class="ambient-blob w-72 h-72 bg-pink-200/40 bottom-10 left-10"></div>
 
-        <!-- 主手機容器 -->
         <div class="max-w-md mx-auto min-h-screen relative z-10 px-4 pt-8 pb-12 flex flex-col justify-between">
-            
-            <!-- 頂部頁眉區塊 -->
             <header>
-                <!-- 頂部導航 (時光機功能) -->
                 <div class="flex items-center justify-between mb-5">
                     <div class="flex items-center space-x-2">
                         <button @click="prevWeek" class="glass-pill w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition opacity-80 hover:opacity-100" :class="isDark ? 'text-white' : ''">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         </button>
-                        
                         <div class="text-center px-2">
                             <p class="text-[10px] font-bold uppercase tracking-widest mb-0.5 transition-colors" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60 text-blue-500'">{{ viewedMonthYearStr }}</p>
                             <h1 class="text-2xl font-extrabold tracking-tight leading-none" :class="isDark ? 'text-white' : ''">
@@ -155,40 +68,25 @@
                                 <span v-else>未來計畫</span>
                             </h1>
                         </div>
-
                         <button @click="nextWeek" class="glass-pill w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition opacity-80 hover:opacity-100" :class="isDark ? 'text-white' : ''">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </button>
                     </div>
-
-                    <!-- 設定按鈕 -->
                     <button @click="showSettings = true" class="glass-pill p-2.5 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'text-white' : ''">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </button>
                 </div>
 
-                <!-- 回到今天按鈕 -->
                 <transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 -translate-y-2">
                     <div v-if="!isToday" class="flex justify-center mb-3">
-                        <button @click="resetToToday" class="text-xs px-4 py-1.5 rounded-full font-bold shadow-sm active:scale-95 transition-all"
-                                :class="isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'">
+                        <button @click="resetToToday" class="text-xs px-4 py-1.5 rounded-full font-bold shadow-sm active:scale-95 transition-all" :class="isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'">
                             返回今天
                         </button>
                     </div>
                 </transition>
 
-                <!-- 星期一至星期日橫向選擇列 -->
                 <div class="flex justify-between items-center glass-card p-1.5 rounded-2xl mb-5 shadow-sm">
-                    <button 
-                        v-for="day in weekDaysWithDates" 
-                        :key="day.value" 
-                        @click="selectedDay = day.value"
-                        class="flex-1 py-2 rounded-xl flex flex-col items-center transition-all duration-300 relative"
-                        :class="selectedDay === day.value ? (isDark ? 'bg-[#333537] text-white font-bold' : 'bg-white shadow-md font-bold text-blue-600') : (isDark ? 'opacity-70 hover:opacity-100 text-[#e3e3e3]' : 'opacity-70 hover:opacity-100 text-black')"
-                    >
+                    <button v-for="day in weekDaysWithDates" :key="day.value" @click="selectedDay = day.value" class="flex-1 py-2 rounded-xl flex flex-col items-center transition-all duration-300 relative" :class="selectedDay === day.value ? (isDark ? 'bg-[#333537] text-white font-bold' : 'bg-white shadow-md font-bold text-blue-600') : (isDark ? 'opacity-70 hover:opacity-100 text-[#e3e3e3]' : 'opacity-70 hover:opacity-100 text-black')">
                         <span class="text-[10px] tracking-wider uppercase opacity-80">{{ day.shortLabel }}</span>
                         <span class="text-sm my-0.5">{{ day.label }}</span>
                         <span class="text-[9px] font-mono" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">{{ day.dayNum }}日</span>
@@ -196,68 +94,42 @@
                     </button>
                 </div>
 
-                <!-- 總覽卡片區 -->
                 <div class="space-y-3 mb-6">
-                    <!-- 該日固定事項完成度 -->
                     <div class="glass-card p-4 rounded-2xl shadow-sm">
                         <div class="flex justify-between items-end mb-2">
                             <div>
-                                <span class="text-xs font-medium" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">
-                                    {{ getDayName(selectedDay) }} 固定事項完成度
-                                </span>
-                                <h2 class="text-xl font-bold tracking-tight mt-0.5" :class="isDark ? 'text-white' : ''">
-                                    {{ completedFixedCount }} / {{ currentFixedTasks.length }} 事項
-                                </h2>
+                                <span class="text-xs font-medium" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">{{ getDayName(selectedDay) }} 固定事項完成度</span>
+                                <h2 class="text-xl font-bold tracking-tight mt-0.5" :class="isDark ? 'text-white' : ''">{{ completedFixedCount }} / {{ currentFixedTasks.length }} 事項</h2>
                             </div>
-                            <span class="text-lg font-extrabold transition-colors" :class="isDark ? 'text-white' : 'text-blue-500'">
-                                {{ progressPercent }}%
-                            </span>
+                            <span class="text-lg font-extrabold transition-colors" :class="isDark ? 'text-white' : 'text-blue-500'">{{ progressPercent }}%</span>
                         </div>
                         <div class="w-full h-2 rounded-full overflow-hidden p-0.5" :class="isDark ? 'bg-[#131314]' : 'bg-black/10'">
-                            <div 
-                                class="h-full rounded-full transition-all duration-500 ease-out"
-                                :class="isDark ? 'bg-white' : 'bg-gradient-to-r from-blue-500 to-indigo-500'"
-                                :style="{ width: progressPercent + '%' }"
-                            ></div>
+                            <div class="h-full rounded-full transition-all duration-500 ease-out" :class="isDark ? 'bg-white' : 'bg-gradient-to-r from-blue-500 to-indigo-500'" :style="{ width: progressPercent + '%' }"></div>
                         </div>
                     </div>
 
-                    <!-- 檢視中月份全月總計完成度 -->
                     <div class="glass-card p-4 rounded-2xl shadow-sm border-l-4" :class="isDark ? 'border-l-gray-400' : 'border-l-indigo-500'">
                         <div class="flex justify-between items-end mb-2">
                             <div>
                                 <div class="flex items-center gap-1.5">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" :class="isDark ? 'text-gray-400' : 'text-indigo-500'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                    <span class="text-xs font-medium" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">
-                                        {{ monthStats.monthLabel }} 累計完成 (含所有彈性)
-                                    </span>
+                                    <span class="text-xs font-medium" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">{{ monthStats.monthLabel }} 累計完成 (含彈性)</span>
                                 </div>
-                                <h2 class="text-xl font-bold tracking-tight mt-0.5" :class="isDark ? 'text-white' : ''">
-                                    {{ monthStats.completed }} / {{ monthStats.total }} 總事項
-                                </h2>
+                                <h2 class="text-xl font-bold tracking-tight mt-0.5" :class="isDark ? 'text-white' : ''">{{ monthStats.completed }} / {{ monthStats.total }} 總事項</h2>
                             </div>
-                            <span class="text-lg font-extrabold transition-colors" :class="isDark ? 'text-white' : 'text-indigo-500'">
-                                {{ monthStats.percent }}%
-                            </span>
+                            <span class="text-lg font-extrabold transition-colors" :class="isDark ? 'text-white' : 'text-indigo-500'">{{ monthStats.percent }}%</span>
                         </div>
                         <div class="w-full h-2 rounded-full overflow-hidden p-0.5" :class="isDark ? 'bg-[#131314]' : 'bg-black/10'">
-                            <div 
-                                class="h-full rounded-full transition-all duration-500 ease-out"
-                                :class="isDark ? 'bg-gray-400' : 'bg-gradient-to-r from-indigo-500 to-purple-500'"
-                                :style="{ width: monthStats.percent + '%' }"
-                            ></div>
+                            <div class="h-full rounded-full transition-all duration-500 ease-out" :class="isDark ? 'bg-gray-400' : 'bg-gradient-to-r from-indigo-500 to-purple-500'" :style="{ width: monthStats.percent + '%' }"></div>
                         </div>
                     </div>
                 </div>
             </header>
 
             <main class="flex-1 mb-6">
-                <!-- 區塊 1：固定待辦事項 -->
                 <div class="mb-8">
                     <div class="flex items-center justify-between mb-3 px-1">
-                        <h3 class="text-sm font-semibold" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">
-                            {{ getDayName(selectedDay) }} 固定事項 ({{ currentFixedTasks.length }})
-                        </h3>
+                        <h3 class="text-sm font-semibold" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">{{ getDayName(selectedDay) }} 固定事項 ({{ currentFixedTasks.length }})</h3>
                         <span v-if="isToday" class="text-xs px-2.5 py-0.5 rounded-full font-medium transition-colors" :class="isDark ? 'bg-white/10 text-white' : 'bg-blue-500/10 text-blue-500'">今天</span>
                     </div>
 
@@ -266,24 +138,13 @@
                     </div>
 
                     <div class="space-y-3">
-                        <div 
-                            v-for="task in currentFixedTasks" 
-                            :key="`${selectedDayDateStr}_${task.id}`"
-                            class="glass-card p-4 rounded-2xl flex items-center justify-between transition-all duration-300"
-                            :class="{'opacity-50': isTaskCompleted(task.id, selectedDayDateStr)}"
-                        >
+                        <div v-for="task in currentFixedTasks" :key="`${selectedDayDateStr}_${task.id}`" class="glass-card p-4 rounded-2xl flex items-center justify-between transition-all duration-300" :class="{'opacity-50': isTaskCompleted(task.id, selectedDayDateStr)}">
                             <div class="flex items-center space-x-3.5 flex-1 min-w-0">
-                                <button 
-                                    @click="toggleTask(task.id, selectedDayDateStr)"
-                                    class="checkbox-bounce w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200 shrink-0"
-                                    :class="isTaskCompleted(task.id, selectedDayDateStr) ? (isDark ? 'bg-white border-white text-[#1a1917]' : 'bg-blue-500 border-blue-500 text-white') : (isDark ? 'bg-white/5 border-white/20' : 'border-black/30 bg-black/5')"
-                                >
+                                <button @click="toggleTask(task.id, selectedDayDateStr)" class="checkbox-bounce w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200 shrink-0" :class="isTaskCompleted(task.id, selectedDayDateStr) ? (isDark ? 'bg-white border-white text-[#1a1917]' : 'bg-blue-500 border-blue-500 text-white') : (isDark ? 'bg-white/5 border-white/20' : 'border-black/30 bg-black/5')">
                                     <svg v-if="isTaskCompleted(task.id, selectedDayDateStr)" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 </button>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-base font-medium truncate transition-all duration-200" :class="{'line-through opacity-70': isTaskCompleted(task.id, selectedDayDateStr), 'text-white': isDark}">
-                                        {{ task.title }}
-                                    </p>
+                                    <p class="text-base font-medium truncate transition-all duration-200" :class="{'line-through opacity-70': isTaskCompleted(task.id, selectedDayDateStr), 'text-white': isDark}">{{ task.title }}</p>
                                     <p class="text-[11px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">{{ getRepeatText(task.repeatDays) }}</p>
                                 </div>
                             </div>
@@ -294,97 +155,29 @@
                     </div>
                 </div>
 
-                <!-- 區塊 2：每週彈性目標 -->
-                <div v-if="flexibleTasks.length > 0" class="mb-8">
+                <div v-if="flexibleTasks.length > 0">
                     <div class="flex items-center justify-between mb-3 px-1">
                         <div class="flex items-center gap-2">
-                            <h3 class="text-sm font-semibold" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">本週彈性目標 ({{ flexibleTasks.length }})</h3>
+                            <h3 class="text-sm font-semibold" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">彈性目標 ({{ flexibleTasks.length }})</h3>
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 transition-colors" :class="isDark ? 'text-[#e3e3e3]' : 'text-orange-500'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="m17 5-5-3-5 3"></path><path d="m17 19-5 3-5-3"></path><path d="M2 12h20"></path><path d="m5 7 3 5-3 5"></path><path d="m19 7-3 5 3 5"></path></svg>
                         </div>
                     </div>
 
                     <div class="space-y-3">
-                        <div 
-                            v-for="task in flexibleTasks" 
-                            :key="`${selectedDayDateStr}_${task.id}`"
-                            class="glass-card p-4 rounded-2xl flex items-center justify-between transition-all duration-300"
-                            :class="getFlexibleProgress(task.id) >= task.weeklyTarget ? (isDark ? 'border-gray-500/50' : 'border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.1)]') : ''"
-                        >
+                        <div v-for="task in flexibleTasks" :key="`${selectedDayDateStr}_${task.id}`" class="glass-card p-4 rounded-2xl flex items-center justify-between transition-all duration-300" :class="getFlexibleProgress(task) >= task.targetCount ? (isDark ? 'border-gray-500/50' : 'border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.1)]') : ''">
                             <div class="flex items-center space-x-3.5 flex-1 min-w-0">
-                                <button 
-                                    @click="toggleTask(task.id, selectedDayDateStr)"
-                                    class="checkbox-bounce w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200 shrink-0"
-                                    :class="isTaskCompleted(task.id, selectedDayDateStr) ? (isDark ? 'bg-white border-white text-[#1a1917]' : 'bg-orange-500 border-orange-500 text-white') : (isDark ? 'bg-white/5 border-white/20' : 'border-black/30 bg-black/5')"
-                                >
+                                <button @click="toggleTask(task.id, selectedDayDateStr)" class="checkbox-bounce w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200 shrink-0" :class="isTaskCompleted(task.id, selectedDayDateStr) ? (isDark ? 'bg-white border-white text-[#1a1917]' : 'bg-orange-500 border-orange-500 text-white') : (isDark ? 'bg-white/5 border-white/20' : 'border-black/30 bg-black/5')">
                                     <svg v-if="isTaskCompleted(task.id, selectedDayDateStr)" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 </button>
-                                
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-base font-medium truncate" :class="{'opacity-50': isTaskCompleted(task.id, selectedDayDateStr), 'text-white': isDark}">
-                                        {{ task.title }}
-                                    </p>
+                                    <p class="text-base font-medium truncate text-white dark:text-white" :class="{'opacity-50': isTaskCompleted(task.id, selectedDayDateStr)}">{{ task.title }}</p>
                                     <div class="flex items-center gap-1.5 mt-1.5">
                                         <div class="flex gap-1">
-                                            <span 
-                                                v-for="n in Math.max(task.weeklyTarget, getFlexibleProgress(task.id))" 
-                                                :key="n"
-                                                class="w-1.5 h-1.5 rounded-full transition-colors duration-300"
-                                                :class="n <= getFlexibleProgress(task.id) ? (isDark ? 'bg-white' : 'bg-orange-500') : (isDark ? 'bg-white/20' : 'bg-black/15')"
-                                            ></span>
+                                            <span v-for="n in Math.min(task.targetCount, 5)" :key="n" class="w-1.5 h-1.5 rounded-full transition-colors duration-300" :class="n <= getFlexibleProgress(task) ? (isDark ? 'bg-white' : 'bg-orange-500') : (isDark ? 'bg-white/20' : 'bg-black/15')"></span>
+                                            <span v-if="task.targetCount > 5 && getFlexibleProgress(task) > 5" class="text-[10px] ml-0.5" :class="isDark ? 'text-white' : 'text-orange-500'">+</span>
                                         </div>
                                         <span class="text-[10px] font-bold ml-1" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">
-                                            {{ getFlexibleProgress(task.id) }} / {{ task.weeklyTarget }} 次
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button @click="openDeleteModal(task)" class="p-2 transition rounded-lg ml-2" :class="isDark ? 'text-[#e3e3e3] hover:text-white' : 'opacity-30 hover:opacity-100 text-red-500'">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 區塊 3：每月彈性目標 -->
-                <div v-if="monthlyFlexibleTasks.length > 0">
-                    <div class="flex items-center justify-between mb-3 px-1">
-                        <div class="flex items-center gap-2">
-                            <h3 class="text-sm font-semibold" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">本月彈性目標 ({{ monthlyFlexibleTasks.length }})</h3>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 transition-colors" :class="isDark ? 'text-[#e3e3e3]' : 'text-purple-500'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div 
-                            v-for="task in monthlyFlexibleTasks" 
-                            :key="`${selectedDayDateStr}_${task.id}`"
-                            class="glass-card p-4 rounded-2xl flex items-center justify-between transition-all duration-300"
-                            :class="getMonthlyFlexibleProgress(task.id) >= task.monthlyTarget ? (isDark ? 'border-gray-500/50' : 'border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.1)]') : ''"
-                        >
-                            <div class="flex items-center space-x-3.5 flex-1 min-w-0">
-                                <button 
-                                    @click="toggleTask(task.id, selectedDayDateStr)"
-                                    class="checkbox-bounce w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200 shrink-0"
-                                    :class="isTaskCompleted(task.id, selectedDayDateStr) ? (isDark ? 'bg-white border-white text-[#1a1917]' : 'bg-purple-500 border-purple-500 text-white') : (isDark ? 'bg-white/5 border-white/20' : 'border-black/30 bg-black/5')"
-                                >
-                                    <svg v-if="isTaskCompleted(task.id, selectedDayDateStr)" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                </button>
-                                
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-base font-medium truncate" :class="{'opacity-50': isTaskCompleted(task.id, selectedDayDateStr), 'text-white': isDark}">
-                                        {{ task.title }}
-                                    </p>
-                                    <div class="flex items-center gap-1.5 mt-1.5">
-                                        <div class="flex gap-1 flex-wrap max-w-[120px]">
-                                            <span 
-                                                v-for="n in Math.max(task.monthlyTarget, getMonthlyFlexibleProgress(task.id))" 
-                                                :key="n"
-                                                class="w-1.5 h-1.5 rounded-full transition-colors duration-300 mb-0.5"
-                                                :class="n <= getMonthlyFlexibleProgress(task.id) ? (isDark ? 'bg-white' : 'bg-purple-500') : (isDark ? 'bg-white/20' : 'bg-black/15')"
-                                            ></span>
-                                        </div>
-                                        <span class="text-[10px] font-bold ml-1" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">
-                                            {{ getMonthlyFlexibleProgress(task.id) }} / {{ task.monthlyTarget }} 次
+                                            ({{ task.flexType === 'weekly' ? '本週' : '本月' }}) {{ getFlexibleProgress(task) }} / {{ task.targetCount }} 次
                                         </span>
                                     </div>
                                 </div>
@@ -397,13 +190,9 @@
                 </div>
             </main>
 
-            <!-- 底部新增按鈕固定區 -->
+            <!-- 底部新增按鈕 -->
             <div class="sticky bottom-6 z-20 pt-2">
-                <button 
-                    @click="openAddModal"
-                    class="w-full py-4 rounded-2xl font-semibold flex items-center justify-center space-x-2 active:scale-[0.98] transition-all duration-200"
-                    :class="isDark ? 'bg-[#333537] text-white border border-[#444749] shadow-none' : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20'"
-                >
+                <button @click="openAddModal" class="w-full py-4 rounded-2xl font-semibold flex items-center justify-center space-x-2 active:scale-[0.98] transition-all duration-200" :class="isDark ? 'bg-[#333537] text-white border border-[#444749] shadow-none' : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20'">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="6" y1="12" x2="18" y2="12"></line></svg>
                     <span>新增待辦事項</span>
                 </button>
@@ -411,8 +200,8 @@
 
             <!-- 新增事項 Modal -->
             <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity" :class="isDark ? 'bg-black/80' : 'bg-black/70 backdrop-blur-sm'">
-                <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all duration-300 max-h-[90vh] overflow-y-auto no-scrollbar">
-                    <div class="flex justify-between items-center mb-5 sticky top-0 bg-transparent z-10 pt-2">
+                <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all duration-300 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-5">
                         <h3 class="text-xl font-bold tracking-tight" :class="isDark ? 'text-white' : ''">新增事項</h3>
                         <button @click="showAddModal = false" class="p-2 opacity-60 hover:opacity-100 rounded-full" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/5'">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -420,24 +209,23 @@
                     </div>
 
                     <div class="flex p-1 rounded-xl mb-5 border" :class="isDark ? 'bg-[#131314] border-[#333537]' : 'bg-black/5 border-black/5'">
-                        <button type="button" @click="newTaskType = 'fixed'" :class="newTaskType === 'fixed' ? (isDark ? 'bg-[#333537] text-white font-bold' : 'bg-white shadow-sm font-bold text-blue-600') : (isDark ? 'text-[#e3e3e3] opacity-80' : 'opacity-60 font-medium')" class="flex-1 py-2.5 rounded-lg text-sm transition-all">固定</button>
-                        <button type="button" @click="newTaskType = 'flexible'" :class="newTaskType === 'flexible' ? (isDark ? 'bg-[#333537] text-white font-bold' : 'bg-white shadow-sm font-bold text-orange-500') : (isDark ? 'text-[#e3e3e3] opacity-80' : 'opacity-60 font-medium')" class="flex-1 py-2.5 rounded-lg text-sm transition-all">每週彈性</button>
-                        <button type="button" @click="newTaskType = 'monthly_flexible'" :class="newTaskType === 'monthly_flexible' ? (isDark ? 'bg-[#333537] text-white font-bold' : 'bg-white shadow-sm font-bold text-purple-600') : (isDark ? 'text-[#e3e3e3] opacity-80' : 'opacity-60 font-medium')" class="flex-1 py-2.5 rounded-lg text-sm transition-all">每月彈性</button>
+                        <button type="button" @click="newTaskType = 'fixed'" :class="newTaskType === 'fixed' ? (isDark ? 'bg-[#333537] text-white font-bold' : 'bg-white shadow-sm font-bold text-blue-600') : (isDark ? 'text-[#e3e3e3] opacity-80' : 'opacity-60 font-medium')" class="flex-1 py-2.5 rounded-lg text-sm transition-all">固定排程</button>
+                        <button type="button" @click="newTaskType = 'flexible_week'" :class="newTaskType === 'flexible_week' ? (isDark ? 'bg-[#333537] text-white font-bold' : 'bg-white shadow-sm font-bold text-orange-500') : (isDark ? 'text-[#e3e3e3] opacity-80' : 'opacity-60 font-medium')" class="flex-1 py-2.5 rounded-lg text-sm transition-all">每週彈性</button>
+                        <button type="button" @click="newTaskType = 'flexible_month'" :class="newTaskType === 'flexible_month' ? (isDark ? 'bg-[#333537] text-white font-bold' : 'bg-white shadow-sm font-bold text-purple-500') : (isDark ? 'text-[#e3e3e3] opacity-80' : 'opacity-60 font-medium')" class="flex-1 py-2.5 rounded-lg text-sm transition-all">每月彈性</button>
                     </div>
 
                     <form @submit.prevent="addNewTask">
                         <div class="mb-5">
                             <label class="block text-xs font-semibold uppercase mb-2" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">事項名稱</label>
-                            <input v-model="newTaskTitle" type="text" placeholder="例如：打高爾夫球..." class="glass-input w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 text-base" :class="isDark ? 'focus:ring-white/50 text-white' : 'focus:ring-blue-500'" required>
+                            <input v-model="newTaskTitle" type="text" placeholder="例如：打高爾夫球、去健身房..." class="glass-input w-full px-4 py-3 rounded-xl focus:outline-none focus:ring-2 text-base" :class="isDark ? 'focus:ring-white/50 text-white placeholder-gray-500' : 'focus:ring-blue-500'" required>
                         </div>
 
-                        <!-- 固定排程設定 -->
                         <div v-if="newTaskType === 'fixed'" class="mb-6">
                             <div class="flex justify-between items-center mb-2">
                                 <label class="text-xs font-semibold uppercase" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">選擇重複星期</label>
                                 <div class="space-x-2 text-xs font-medium" :class="isDark ? 'text-white' : 'text-blue-500'">
                                     <button type="button" @click="selectAllDays">每天</button>
-                                    <span :class="isDark ? 'text-[#e3e3e3]' : 'opacity-30'">•</span>
+                                    <span :class="isDark ? 'text-gray-500' : 'opacity-30'">•</span>
                                     <button type="button" @click="selectWorkDays">工作日</button>
                                 </div>
                             </div>
@@ -448,45 +236,27 @@
                             </div>
                         </div>
 
-                        <!-- 每週彈性設定 -->
-                        <div v-if="newTaskType === 'flexible'" class="mb-6 p-4 rounded-xl flex justify-between items-center border" :class="isDark ? 'bg-[#131314] border-[#333537]' : 'bg-black/5 border-black/5'">
+                        <div v-if="newTaskType.startsWith('flexible')" class="mb-6 p-4 rounded-xl flex justify-between items-center border" :class="isDark ? 'bg-[#131314] border-[#333537]' : 'bg-black/5 border-black/5'">
                             <div>
-                                <label class="block text-sm font-semibold" :class="isDark ? 'text-white' : ''">每週目標次數</label>
-                                <p class="text-[10px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">不必指定日期，一週內完成即可</p>
+                                <label class="block text-sm font-semibold" :class="isDark ? 'text-white' : ''">目標次數 ({{ newTaskType === 'flexible_week' ? '每週' : '每月' }})</label>
+                                <p class="text-[10px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">不必指定日期，期間內完成即可</p>
                             </div>
                             <div class="flex items-center space-x-4">
-                                <button type="button" @click="decreaseWeeklyTarget" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/10'">
+                                <button type="button" @click="decreaseTarget" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/10'">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                 </button>
-                                <span class="text-xl font-bold w-4 text-center" :class="isDark ? 'text-white' : ''">{{ newTaskWeeklyTarget }}</span>
-                                <button type="button" @click="increaseWeeklyTarget" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/10'">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 每月彈性設定 -->
-                        <div v-if="newTaskType === 'monthly_flexible'" class="mb-6 p-4 rounded-xl flex justify-between items-center border" :class="isDark ? 'bg-[#131314] border-[#333537]' : 'bg-black/5 border-black/5'">
-                            <div>
-                                <label class="block text-sm font-semibold" :class="isDark ? 'text-white' : ''">每月目標次數</label>
-                                <p class="text-[10px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">不必指定日期，該月內完成即可</p>
-                            </div>
-                            <div class="flex items-center space-x-4">
-                                <button type="button" @click="decreaseMonthlyTarget" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/10'">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                </button>
-                                <span class="text-xl font-bold w-4 text-center" :class="isDark ? 'text-white' : ''">{{ newTaskMonthlyTarget }}</span>
-                                <button type="button" @click="increaseMonthlyTarget" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/10'">
+                                <span class="text-xl font-bold w-4 text-center" :class="isDark ? 'text-white' : ''">{{ newTaskTargetCount }}</span>
+                                <button type="button" @click="increaseTarget" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/10'">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                 </button>
                             </div>
                         </div>
                         
-                        <p class="text-[10px] mb-4 text-center" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-50'">💡 事項將從您目前檢視的日期 ({{ selectedDayDateStr }}) 起生效，不會影響過去的日子。</p>
+                        <p class="text-[10px] mb-4 text-center" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-50'">💡 事項將從您目前檢視的日期 ({{ selectedDayDateStr }}) 起生效。</p>
 
                         <div class="flex gap-3">
                             <button type="button" @click="showAddModal = false" class="flex-1 py-3.5 rounded-xl glass-pill font-semibold active:scale-95 transition text-sm" :class="isDark ? 'text-white' : ''">取消</button>
-                            <button type="submit" class="flex-1 py-3.5 rounded-xl font-semibold shadow-md active:scale-95 transition text-sm text-white" :class="newTaskType === 'fixed' ? (isDark ? 'bg-[#333537] shadow-none' : 'bg-blue-600') : (newTaskType === 'flexible' ? (isDark ? 'bg-[#333537] shadow-none' : 'bg-orange-600') : (isDark ? 'bg-[#333537] shadow-none' : 'bg-purple-600'))">儲存事項</button>
+                            <button type="submit" class="flex-1 py-3.5 rounded-xl font-semibold shadow-md active:scale-95 transition text-sm text-white" :class="newTaskType === 'fixed' ? (isDark ? 'bg-[#333537] shadow-none' : 'bg-blue-600') : (isDark ? 'bg-[#333537] shadow-none' : 'bg-orange-600')">儲存事項</button>
                         </div>
                     </form>
                 </div>
@@ -511,12 +281,12 @@
                         
                         <button @click="confirmDelete('future')" class="w-full p-4 rounded-xl border transition text-left" :class="isDark ? 'bg-[#131314] hover:bg-[#282a2c] border-[#333537]' : 'bg-black/5 hover:bg-black/10 border-black/5'">
                             <p class="font-semibold text-sm" :class="isDark ? 'text-white' : ''">從這天起刪除 (終止計畫)</p>
-                            <p class="text-[11px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">保留過去的歷史打勾紀錄，未來不再排程</p>
+                            <p class="text-[11px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">保留過去的歷史紀錄，未來不再排程</p>
                         </button>
 
                         <button @click="confirmDelete('all')" class="w-full p-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 transition text-left">
                             <p class="font-semibold text-sm">徹底刪除 (抹除痕跡)</p>
-                            <p class="text-[11px] opacity-80 mt-0.5">完全從系統中移除，包含過去所有紀錄</p>
+                            <p class="text-[11px] opacity-80 mt-0.5" :class="isDark ? 'text-red-400' : ''">完全從系統中移除，包含過去所有紀錄</p>
                         </button>
                     </div>
 
@@ -524,14 +294,30 @@
                 </div>
             </div>
 
-            <!-- 設定 Modal -->
+            <!-- 設定 Modal (含備份還原) -->
             <div v-if="showSettings" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity" :class="isDark ? 'bg-black/80' : 'bg-black/70 backdrop-blur-sm'">
-                <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all duration-300">
+                <div class="glass-modal w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all duration-300 max-h-[90vh] overflow-y-auto">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-bold tracking-tight" :class="isDark ? 'text-white' : ''">偏好設定</h3>
                         <button @click="showSettings = false" class="p-2 opacity-60 hover:opacity-100 rounded-full" :class="isDark ? 'bg-white/10 text-white' : 'bg-black/5'">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
+                    </div>
+
+                    <!-- 資料備份與安全區塊 -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-semibold uppercase mb-3" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">資料備份與安全</label>
+                        <div class="space-y-3">
+                            <button @click="exportData" class="w-full py-3 rounded-xl border transition flex items-center justify-center space-x-2" :class="isDark ? 'bg-[#131314] hover:bg-[#282a2c] border-[#333537] text-white' : 'bg-white hover:bg-blue-50 border-blue-200 text-blue-600'">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                <span class="font-semibold text-sm">複製備份代碼 (匯出)</span>
+                            </button>
+                            <button @click="importData" class="w-full py-3 rounded-xl border transition flex items-center justify-center space-x-2" :class="isDark ? 'bg-[#131314] hover:bg-[#282a2c] border-[#333537] text-[#e3e3e3]' : 'bg-black/5 hover:bg-black/10 border-black/10 text-black'">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                <span class="font-semibold text-sm">貼上備份代碼 (匯入)</span>
+                            </button>
+                        </div>
+                        <p class="text-[10px] mt-2 text-center" :class="isDark ? 'text-sepia-dim' : 'opacity-60'">建議定期匯出代碼並保存在「備忘錄」，以防資料遺失。</p>
                     </div>
 
                     <div class="mb-6">
@@ -558,7 +344,6 @@
                     <button @click="showSettings = false" class="w-full mt-6 py-3.5 rounded-xl font-semibold active:scale-95 transition text-sm" :class="isDark ? 'bg-white text-[#1a1917]' : 'bg-blue-600 text-white shadow-md'">完成</button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -576,10 +361,7 @@
                     { value: 7, label: '日', shortLabel: 'Sun' }
                 ];
 
-                const getRealTodayDayValue = () => {
-                    const d = new Date().getDay();
-                    return d === 0 ? 7 : d;
-                };
+                const getRealTodayDayValue = () => { const d = new Date().getDay(); return d === 0 ? 7 : d; };
 
                 const realTodayDayValue = getRealTodayDayValue();
                 const selectedDay = ref(realTodayDayValue);
@@ -612,6 +394,17 @@
                 });
 
                 const currentWeekDateStrings = computed(() => daysOfWeek.map(day => formatDateStr(getTargetDate(day.value, weekOffset.value))));
+                const currentMonthDateStrings = computed(() => {
+                    const targetDateObj = getTargetDate(selectedDay.value, weekOffset.value);
+                    const year = targetDateObj.getFullYear();
+                    const month = targetDateObj.getMonth();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    let dates = [];
+                    for(let i=1; i<=daysInMonth; i++) {
+                        dates.push(formatDateStr(new Date(year, month, i)));
+                    }
+                    return dates;
+                });
 
                 const viewedMonthYearStr = computed(() => {
                     const d = getTargetDate(selectedDay.value, weekOffset.value);
@@ -624,33 +417,35 @@
                 const nextWeek = () => weekOffset.value++;
                 const resetToToday = () => { weekOffset.value = 0; selectedDay.value = getRealTodayDayValue(); };
 
-                // 預設資料
+                // 任務資料結構 (v5: 加入了 flexType: 'weekly' 或 'monthly', targetCount)
                 const defaultTasks = [
                     { id: '1', type: 'fixed', title: 'Read AI news summary', repeatDays: [1, 2, 3, 4, 5, 6, 7], createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                    { id: '2', type: 'fixed', title: 'Growth mindset IG post', repeatDays: [2, 4, 6], createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                    { id: '3', type: 'fixed', title: 'MOS IG post', repeatDays: [2, 5], createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                    { id: '4', type: 'fixed', title: 'Add EEAT & GEO schema into blogs', repeatDays: [2, 3, 4, 5, 6], createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                    { id: '5', type: 'fixed', title: 'MOS Red-note post', repeatDays: [1, 3, 5], createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                    { id: '6', type: 'flexible', title: '去健身房運動', weeklyTarget: 2, createdDate: '2020-01-01', endDate: null, skipDates: [] },
-                    { id: '7', type: 'monthly_flexible', title: '打高爾夫球', monthlyTarget: 2, createdDate: '2020-01-01', endDate: null, skipDates: [] }
+                    { id: '2', type: 'fixed', title: 'MOS Red-note post', repeatDays: [1, 3, 5], createdDate: '2020-01-01', endDate: null, skipDates: [] },
+                    { id: '6', type: 'flexible', flexType: 'weekly', title: '去健身房運動', targetCount: 2, createdDate: '2020-01-01', endDate: null, skipDates: [] },
+                    { id: '7', type: 'flexible', flexType: 'monthly', title: '去打高爾夫球', targetCount: 2, createdDate: '2020-01-01', endDate: null, skipDates: [] }
                 ];
 
                 const tasks = ref([]);
                 const completions = ref({});
 
-                // 本機資料遷移與載入防護
                 const loadData = () => {
-                    let savedTasksV5 = localStorage.getItem('todo_repeat_tasks_v5'); 
-                    if (savedTasksV5) {
-                        try { tasks.value = JSON.parse(savedTasksV5); } catch (e) { tasks.value = defaultTasks; }
+                    let savedTasks = localStorage.getItem('todo_repeat_tasks_v5'); // 升級為 v5 以支援每月目標
+                    if (savedTasks) {
+                        try { tasks.value = JSON.parse(savedTasks); } catch (e) { tasks.value = defaultTasks; }
                     } else {
-                        // 如果沒有 V5，嘗試從 V4 遷移，保證舊紀錄不流失
-                        let savedTasksV4 = localStorage.getItem('todo_repeat_tasks_v4');
-                        if (savedTasksV4) {
-                            try { 
-                                tasks.value = JSON.parse(savedTasksV4); 
+                        // 平滑升級舊資料
+                        const oldTasks = localStorage.getItem('todo_repeat_tasks_v4') || localStorage.getItem('todo_repeat_tasks_v3');
+                        if (oldTasks) {
+                            try {
+                                const parsed = JSON.parse(oldTasks);
+                                tasks.value = parsed.map(t => {
+                                    if(t.type === 'flexible') {
+                                        return {...t, flexType: t.flexType || 'weekly', targetCount: t.targetCount || t.weeklyTarget || 1};
+                                    }
+                                    return t;
+                                });
                                 localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
-                            } catch (e) { tasks.value = defaultTasks; }
+                            } catch(e) { tasks.value = defaultTasks; }
                         } else {
                             tasks.value = defaultTasks;
                         }
@@ -659,6 +454,43 @@
                     const savedCompletions = localStorage.getItem('todo_completions');
                     if (savedCompletions) {
                         try { completions.value = JSON.parse(savedCompletions); } catch (e) { completions.value = {}; }
+                    }
+                };
+
+                // --- 備份與還原功能 (Export/Import) ---
+                const exportData = () => {
+                    const tasksData = localStorage.getItem('todo_repeat_tasks_v5') || '[]';
+                    const completionsData = localStorage.getItem('todo_completions') || '{}';
+                    const backupObj = { tasks: JSON.parse(tasksData), completions: JSON.parse(completionsData), version: 'v5' };
+                    const backupStr = JSON.stringify(backupObj);
+                    
+                    try {
+                        navigator.clipboard.writeText(backupStr).then(() => {
+                            alert('✅ 備份代碼已成功複製！請立刻去「備忘錄」貼上並安全保存。');
+                        }).catch(() => {
+                            prompt('無法自動複製，請手動全選並複製以下代碼：', backupStr);
+                        });
+                    } catch(e) {
+                        prompt('請手動全選並複製以下代碼：', backupStr);
+                    }
+                };
+
+                const importData = () => {
+                    const backupStr = prompt('📥 請在下方貼上您之前保存的備份代碼：');
+                    if (!backupStr) return;
+                    try {
+                        const backupObj = JSON.parse(backupStr);
+                        if (backupObj && backupObj.tasks && backupObj.completions) {
+                            localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(backupObj.tasks));
+                            localStorage.setItem('todo_completions', JSON.stringify(backupObj.completions));
+                            loadData(); // 重新讀取
+                            showSettings.value = false;
+                            alert('🎉 恭喜！所有資料已成功還原！');
+                        } else {
+                            alert('❌ 備份代碼格式錯誤，請確認是否有漏複製文字。');
+                        }
+                    } catch (e) {
+                        alert('❌ 無法解析代碼，請確認這是一段有效的備份代碼。');
                     }
                 };
 
@@ -677,11 +509,6 @@
                     return tasks.value.filter(t => t.type === 'flexible' && isActiveOnDate(t, selectedDayDateStr.value));
                 });
 
-                // 新增：每月彈性任務過濾
-                const monthlyFlexibleTasks = computed(() => {
-                    return tasks.value.filter(t => t.type === 'monthly_flexible' && isActiveOnDate(t, selectedDayDateStr.value));
-                });
-
                 const completedFixedCount = computed(() => {
                     return currentFixedTasks.value.filter(task => completions.value[`${selectedDayDateStr.value}_${task.id}`]).length;
                 });
@@ -691,26 +518,12 @@
                     return Math.round((completedFixedCount.value / currentFixedTasks.value.length) * 100);
                 });
 
-                const getFlexibleProgress = (taskId) => {
+                // 計算彈性目標完成次數 (支援每週/每月)
+                const getFlexibleProgress = (task) => {
                     let count = 0;
-                    currentWeekDateStrings.value.forEach(dateStr => {
-                        if (completions.value[`${dateStr}_${taskId}`]) count++;
-                    });
-                    return count;
-                };
-
-                // 新增：取得每月彈性任務進度
-                const getMonthlyFlexibleProgress = (taskId) => {
-                    let count = 0;
-                    const targetDateObj = getTargetDate(selectedDay.value, weekOffset.value);
-                    const year = targetDateObj.getFullYear();
-                    const month = String(targetDateObj.getMonth() + 1).padStart(2, '0');
-                    const prefix = `${year}-${month}`;
-                    
-                    Object.keys(completions.value).forEach(key => {
-                        if (key.startsWith(prefix) && key.endsWith(`_${taskId}`) && completions.value[key]) {
-                            count++;
-                        }
+                    const dateArray = task.flexType === 'monthly' ? currentMonthDateStrings.value : currentWeekDateStrings.value;
+                    dateArray.forEach(dateStr => {
+                        if (completions.value[`${dateStr}_${task.id}`]) count++;
                     });
                     return count;
                 };
@@ -724,7 +537,6 @@
                     let totalMonthTasks = 0;
                     let completedMonthTasks = 0;
 
-                    // 1. 固定任務
                     for (let day = 1; day <= daysInMonth; day++) {
                         const dateObj = new Date(year, month, day);
                         const dateStr = formatDateStr(dateObj);
@@ -739,41 +551,29 @@
                         });
                     }
 
-                    // 2. 每週彈性任務
-                    let flexTotalWeeklyInMonth = 0;
+                    // 計算彈性目標預估總數 (每週的換算，每月的直接加)
+                    let flexTotalMonthly = 0;
                     tasks.value.filter(t => t.type === 'flexible').forEach(t => {
                         let activeDaysInMonth = 0;
                         for (let day = 1; day <= daysInMonth; day++) {
                             const dateObj = new Date(year, month, day);
                             if (isActiveOnDate(t, formatDateStr(dateObj))) activeDaysInMonth++;
                         }
-                        flexTotalWeeklyInMonth += Math.round((activeDaysInMonth / 7) * t.weeklyTarget);
-                    });
-                    totalMonthTasks += flexTotalWeeklyInMonth;
-
-                    // 3. 每月彈性任務
-                    let flexTotalMonthly = 0;
-                    tasks.value.filter(t => t.type === 'monthly_flexible').forEach(t => {
-                        // 只要這個月內該任務有生效，就加上目標次數
-                        let isActiveThisMonth = false;
-                        for (let day = 1; day <= daysInMonth; day++) {
-                            const dateObj = new Date(year, month, day);
-                            if (isActiveOnDate(t, formatDateStr(dateObj))) {
-                                isActiveThisMonth = true;
-                                break;
-                            }
+                        if(t.flexType === 'monthly') {
+                            // 如果當月有超過一半的時間生效，就算入完整次數
+                            if(activeDaysInMonth > (daysInMonth/2)) flexTotalMonthly += t.targetCount;
+                        } else {
+                            flexTotalMonthly += Math.round((activeDaysInMonth / 7) * t.targetCount);
                         }
-                        if (isActiveThisMonth) flexTotalMonthly += t.monthlyTarget;
                     });
                     totalMonthTasks += flexTotalMonthly;
 
-                    // 4. 計算所有彈性任務的實際完成數 (每週+每月)
-                    const allFlexIds = tasks.value.filter(t => t.type === 'flexible' || t.type === 'monthly_flexible').map(t => t.id);
+                    const flexIds = tasks.value.filter(t => t.type === 'flexible').map(t => t.id);
                     const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
                     Object.keys(completions.value).forEach(key => {
                         if (completions.value[key]) {
                             const parts = key.split('_');
-                            if (parts.length >= 2 && parts[0].startsWith(monthPrefix) && allFlexIds.includes(parts[1])) {
+                            if (parts.length >= 2 && parts[0].startsWith(monthPrefix) && flexIds.includes(parts[1])) {
                                 completedMonthTasks++;
                             }
                         }
@@ -791,7 +591,6 @@
 
                 const isTaskCompleted = (taskId, dateStr) => !!completions.value[`${dateStr}_${taskId}`];
 
-                // 刪除相關邏輯
                 const showDeleteModal = ref(false);
                 const taskToDelete = ref(null);
 
@@ -802,7 +601,6 @@
 
                 const confirmDelete = (deleteType) => {
                     if(!taskToDelete.value) return;
-                    
                     const taskId = taskToDelete.value.id;
                     const taskIndex = tasks.value.findIndex(t => t.id === taskId);
                     if(taskIndex === -1) return;
@@ -818,9 +616,7 @@
                         tasks.value.splice(taskIndex, 1);
                         const newCompletions = {};
                         Object.keys(completions.value).forEach(key => {
-                            if (!key.endsWith(`_${taskId}`)) {
-                                newCompletions[key] = completions.value[key];
-                            }
+                            if (!key.endsWith(`_${taskId}`)) { newCompletions[key] = completions.value[key]; }
                         });
                         completions.value = newCompletions;
                         localStorage.setItem('todo_completions', JSON.stringify(completions.value));
@@ -831,27 +627,21 @@
                     taskToDelete.value = null;
                 };
 
-                // 新增事項表單
                 const showAddModal = ref(false);
                 const showSettings = ref(false);
-                const newTaskType = ref('fixed');
+                const newTaskType = ref('fixed'); // fixed, flexible_week, flexible_month
                 const newTaskTitle = ref('');
                 const newTaskDays = ref([selectedDay.value]);
-                const newTaskWeeklyTarget = ref(2);
-                const newTaskMonthlyTarget = ref(1);
+                const newTaskTargetCount = ref(2);
 
-                const decreaseWeeklyTarget = () => { if(newTaskWeeklyTarget.value > 1) newTaskWeeklyTarget.value--; };
-                const increaseWeeklyTarget = () => { if(newTaskWeeklyTarget.value < 7) newTaskWeeklyTarget.value++; };
-                
-                const decreaseMonthlyTarget = () => { if(newTaskMonthlyTarget.value > 1) newTaskMonthlyTarget.value--; };
-                const increaseMonthlyTarget = () => { if(newTaskMonthlyTarget.value < 31) newTaskMonthlyTarget.value++; };
+                const decreaseTarget = () => { if(newTaskTargetCount.value > 1) newTaskTargetCount.value--; };
+                const increaseTarget = () => { if(newTaskTargetCount.value < 31) newTaskTargetCount.value++; };
 
                 const openAddModal = () => {
                     newTaskTitle.value = '';
                     newTaskType.value = 'fixed';
                     newTaskDays.value = [selectedDay.value];
-                    newTaskWeeklyTarget.value = 2;
-                    newTaskMonthlyTarget.value = 1;
+                    newTaskTargetCount.value = 2;
                     showAddModal.value = true;
                 };
 
@@ -869,7 +659,7 @@
                     if (!newTaskTitle.value.trim()) return;
                     const newTask = {
                         id: Date.now().toString(),
-                        type: newTaskType.value,
+                        type: newTaskType.value === 'fixed' ? 'fixed' : 'flexible',
                         title: newTaskTitle.value.trim(),
                         createdDate: selectedDayDateStr.value,
                         endDate: null,
@@ -878,10 +668,9 @@
                     
                     if (newTaskType.value === 'fixed') {
                         newTask.repeatDays = [...newTaskDays.value].sort();
-                    } else if (newTaskType.value === 'flexible') {
-                        newTask.weeklyTarget = newTaskWeeklyTarget.value;
-                    } else if (newTaskType.value === 'monthly_flexible') {
-                        newTask.monthlyTarget = newTaskMonthlyTarget.value;
+                    } else {
+                        newTask.flexType = newTaskType.value === 'flexible_week' ? 'weekly' : 'monthly';
+                        newTask.targetCount = newTaskTargetCount.value;
                     }
 
                     tasks.value.push(newTask);
@@ -902,7 +691,7 @@
                 };
 
                 const resetToDefaultTasks = () => {
-                    if (confirm('警告：這將會清除您所有的歷史打勾紀錄並重置為範例任務，確定繼續嗎？')) {
+                    if (confirm('警告：這將會清除您所有的歷史紀錄並重置為範例任務，確定嗎？')) {
                         tasks.value = [...defaultTasks];
                         localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
                         completions.value = {};
@@ -926,11 +715,12 @@
                     isDark, daysOfWeek, weekDaysWithDates, selectedDay, weekOffset,
                     selectedDayDateStr, viewedMonthYearStr, isToday,
                     prevWeek, nextWeek, resetToToday,
-                    tasks, currentFixedTasks, flexibleTasks, monthlyFlexibleTasks,
-                    completedFixedCount, progressPercent, monthStats, getFlexibleProgress, getMonthlyFlexibleProgress,
+                    tasks, currentFixedTasks, flexibleTasks,
+                    completedFixedCount, progressPercent, monthStats, getFlexibleProgress,
                     showAddModal, showSettings, openAddModal,
-                    decreaseWeeklyTarget, increaseWeeklyTarget, decreaseMonthlyTarget, increaseMonthlyTarget,
-                    newTaskType, newTaskTitle, newTaskDays, newTaskWeeklyTarget, newTaskMonthlyTarget,
+                    exportData, importData, // 匯出與匯入功能
+                    decreaseTarget, increaseTarget,
+                    newTaskType, newTaskTitle, newTaskDays, newTaskTargetCount,
                     toggleTask, isTaskCompleted, 
                     showDeleteModal, taskToDelete, openDeleteModal, confirmDelete,
                     toggleNewTaskDay, selectAllDays, selectWorkDays, addNewTask,
