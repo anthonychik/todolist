@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>重複待辦清單 (雲端同步版)</title>
+    <title>重複待辦清單 (完美同步版)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -28,8 +28,7 @@
 
     <script>
         // =========================================================================
-        // 🔴🔴🔴 請將下方替換成你複製的設定。
-        // ⚠️ 檢查重點：如果你的設定裡沒有 "databaseURL" 這一行，請手動補上！
+        // 🔴🔴🔴 請將下方 firebaseConfig 換成你的 Firebase 設定
         // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCC6ah6dp2mMd2DqXzSVv-yVYaTY09-3Uc",
@@ -54,7 +53,7 @@
         .theme-light .glass-input { background: rgba(240, 243, 248, 0.75); border: 1px solid rgba(255, 255, 255, 0.85); color: #1c1c1e; }
         .theme-light .glass-modal { background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.95); }
         .theme-dark { background-color: #1a1917 !important; color: #ffffff !important; }
-        .theme-dark .glass-card { background: #22201e !important; border: 1px solid #363330 !important; }
+        .theme-dark .glass-card { background: #22201e !important; border: 1px solid #363330 !important; box-shadow: none; }
         .theme-dark .glass-pill { background: #2a2725 !important; border: 1px solid #363330 !important; }
         .theme-dark .glass-input { background: #1a1917 !important; border: 1px solid #363330 !important; color: #ffffff !important; }
         .theme-dark .glass-input::placeholder { color: #e3e3e3 !important; opacity: 0.7; }
@@ -141,12 +140,17 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" :class="isDark ? 'text-gray-400' : 'text-indigo-500'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                     <span class="text-xs font-medium" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-70'">{{ monthStats.monthLabel }} 累計完成 (含彈性)</span>
                                 </div>
-                                <h2 class="text-xl font-bold tracking-tight mt-0.5" :class="isDark ? 'text-white' : ''">{{ monthStats.completed }} / {{ monthStats.total }} 總事項</h2>
+                                <!-- 修改的地方：如果分母不是數字，就顯示 0 -->
+                                <h2 class="text-xl font-bold tracking-tight mt-0.5" :class="isDark ? 'text-white' : ''">
+                                    {{ isNaN(monthStats.completed) ? 0 : monthStats.completed }} / {{ isNaN(monthStats.total) ? 0 : monthStats.total }} 總事項
+                                </h2>
                             </div>
-                            <span class="text-lg font-extrabold transition-colors" :class="isDark ? 'text-white' : 'text-indigo-500'">{{ monthStats.percent }}%</span>
+                            <span class="text-lg font-extrabold transition-colors" :class="isDark ? 'text-white' : 'text-indigo-500'">
+                                {{ isNaN(monthStats.percent) ? 0 : monthStats.percent }}%
+                            </span>
                         </div>
                         <div class="w-full h-2 rounded-full overflow-hidden p-0.5" :class="isDark ? 'bg-[#131314]' : 'bg-black/10'">
-                            <div class="h-full rounded-full transition-all duration-500 ease-out" :class="isDark ? 'bg-gray-400' : 'bg-gradient-to-r from-indigo-500 to-purple-500'" :style="{ width: monthStats.percent + '%' }"></div>
+                            <div class="h-full rounded-full transition-all duration-500 ease-out" :class="isDark ? 'bg-gray-400' : 'bg-gradient-to-r from-indigo-500 to-purple-500'" :style="{ width: (isNaN(monthStats.percent) ? 0 : monthStats.percent) + '%' }"></div>
                         </div>
                     </div>
                 </div>
@@ -296,7 +300,9 @@
                             </div>
                         </div>
                         
-                        <div class="flex gap-3 mt-4">
+                        <p class="text-[10px] mb-4 text-center" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-50'">💡 事項將從您目前檢視的日期 ({{ selectedDayDateStr }}) 起生效。</p>
+
+                        <div class="flex gap-3">
                             <button type="button" @click="showAddModal = false" class="flex-1 py-3.5 rounded-xl glass-pill font-semibold active:scale-95 transition text-sm" :class="isDark ? 'text-white' : ''">取消</button>
                             <button type="submit" class="flex-1 py-3.5 rounded-xl font-semibold shadow-md active:scale-95 transition text-sm text-white" :class="isDark ? 'bg-[#333537] shadow-none' : 'bg-blue-600'">儲存事項</button>
                         </div>
@@ -316,12 +322,12 @@
                     </div>
 
                     <div class="space-y-2.5">
-                        <button @click="confirmDelete('single')" class="w-full p-4 rounded-xl border transition text-left" :class="isDark ? 'bg-sepia-bg hover:bg-sepia-border border-sepia-border text-white' : 'bg-black/5 hover:bg-black/10 border-black/5'">
+                        <button @click="confirmDelete('single')" class="w-full p-4 rounded-xl border transition text-left" :class="isDark ? 'bg-[#131314] hover:bg-[#282a2c] border-[#333537]' : 'bg-black/5 hover:bg-black/10 border-black/5'">
                             <p class="font-semibold text-sm" :class="isDark ? 'text-white' : ''">僅刪除這天 ({{ selectedDayDateStr }})</p>
                             <p class="text-[11px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">今天跳過此事項，不影響未來排程</p>
                         </button>
                         
-                        <button @click="confirmDelete('future')" class="w-full p-4 rounded-xl border transition text-left" :class="isDark ? 'bg-sepia-bg hover:bg-sepia-border border-sepia-border text-white' : 'bg-black/5 hover:bg-black/10 border-black/5'">
+                        <button @click="confirmDelete('future')" class="w-full p-4 rounded-xl border transition text-left" :class="isDark ? 'bg-[#131314] hover:bg-[#282a2c] border-[#333537]' : 'bg-black/5 hover:bg-black/10 border-black/5'">
                             <p class="font-semibold text-sm" :class="isDark ? 'text-white' : ''">從這天起刪除 (終止計畫)</p>
                             <p class="text-[11px] mt-0.5" :class="isDark ? 'text-[#e3e3e3]' : 'opacity-60'">保留過去的歷史紀錄，未來不再排程</p>
                         </button>
@@ -457,23 +463,32 @@
                 const tasks = ref([]);
                 const completions = ref({});
 
-                // --- 🌟 關鍵修復：保證本地資料一定會顯示，不怕雲端卡住！ ---
+                // 清洗資料，防止舊資料缺少數值導致變成 NaN
+                const sanitizeTasks = (rawTasks) => {
+                    return (rawTasks || []).map(t => {
+                        if (t.type === 'flexible') {
+                            return { ...t, flexType: t.flexType || 'weekly', targetCount: Number(t.targetCount || t.weeklyTarget || 1) };
+                        }
+                        return t;
+                    });
+                };
+
+                // 優先讀取本地資料，確保不管雲端怎樣畫面都有東西
                 const loadLocalData = () => {
                     const savedTasks = localStorage.getItem('todo_repeat_tasks_v5') || localStorage.getItem('todo_repeat_tasks_v4') || '[]';
                     const savedComps = localStorage.getItem('todo_completions') || '{}';
                     
-                    try { tasks.value = JSON.parse(savedTasks); } catch (e) { tasks.value = []; }
+                    try { tasks.value = sanitizeTasks(JSON.parse(savedTasks)); } catch (e) { tasks.value = []; }
                     try { completions.value = JSON.parse(savedComps); } catch (e) { completions.value = {}; }
                 };
 
-                // --- ☁️ 雲端同步核心邏輯 ---
+                // 雲端同步核心邏輯
                 const initFirebase = () => {
-                    // 如果使用者還沒換掉 firebaseConfig
                     if (!firebaseConfig.databaseURL || firebaseConfig.apiKey.includes("你的_API_KEY")) {
                         console.warn("未設定有效的 Firebase Config，自動切換為單機模式。");
                         isCloudFailed.value = true;
                         showSyncModal.value = false;
-                        return; // 不繼續連線雲端
+                        return;
                     }
                     
                     if (!firebase.apps.length) {
@@ -489,19 +504,18 @@
                     const db = firebase.database();
                     const userRef = db.ref('users/' + syncKey.value);
 
-                    // 監聽雲端資料變化 (如果失敗會觸發錯誤處理)
                     userRef.on('value', (snapshot) => {
                         isCloudConnected.value = true;
                         isCloudFailed.value = false;
                         const data = snapshot.val();
                         if (data) {
-                            tasks.value = data.tasks || [];
+                            // 🌟 防呆：透過 sanitizeTasks 修復舊雲端資料
+                            tasks.value = sanitizeTasks(data.tasks);
                             completions.value = data.completions || {};
-                            // 把雲端抓下來的資料，同步覆蓋一份到本地 (確保離線也能看)
+                            
                             localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
                             localStorage.setItem('todo_completions', JSON.stringify(completions.value));
                         } else {
-                            // 如果雲端是空的，把手機裡的資料傳上去
                             saveToCloud();
                         }
                     }, (error) => {
@@ -520,11 +534,9 @@
                 };
 
                 const saveToCloud = () => {
-                    // 先存一份本地
                     localStorage.setItem('todo_repeat_tasks_v5', JSON.stringify(tasks.value));
                     localStorage.setItem('todo_completions', JSON.stringify(completions.value));
                     
-                    // 如果有雲端且沒壞掉，再上傳
                     if (!syncKey.value || isCloudFailed.value) return;
                     
                     try {
@@ -582,10 +594,11 @@
                         for (let day = 1; day <= daysInMonth; day++) {
                             if (isActiveOnDate(t, formatDateStr(new Date(year, month, day)))) activeDaysInMonth++;
                         }
+                        const target = Number(t.targetCount) || 1; // 雙重保險
                         if(t.flexType === 'monthly') {
-                            if(activeDaysInMonth > (daysInMonth/2)) flexTotalMonthly += t.targetCount;
+                            if(activeDaysInMonth > (daysInMonth/2)) flexTotalMonthly += target;
                         } else {
-                            flexTotalMonthly += Math.round((activeDaysInMonth / 7) * t.targetCount);
+                            flexTotalMonthly += Math.round((activeDaysInMonth / 7) * target);
                         }
                     });
                     totalMonthTasks += flexTotalMonthly;
@@ -703,10 +716,7 @@
                 
                 onMounted(() => {
                     document.body.style.backgroundColor = isDark.value ? '#1a1917' : '#f2f4f8';
-                    
-                    // 🌟 不管雲端有沒有連上，第一時間先把本地資料拿出來顯示！
                     loadLocalData(); 
-
                     if (syncKey.value) {
                         initFirebase();
                     }
